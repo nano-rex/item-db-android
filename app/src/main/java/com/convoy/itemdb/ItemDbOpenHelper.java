@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class ItemDbOpenHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "itemdb.db";
-    private static final int DB_VERSION = 3;
+    private static final int DB_VERSION = 4;
 
     public ItemDbOpenHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -25,9 +25,11 @@ public class ItemDbOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion < 3) {
-            db.execSQL("DROP TABLE IF EXISTS item_history");
+        if (oldVersion < 4) {
+            db.execSQL("DROP TABLE IF EXISTS item_progress");
             db.execSQL("DROP TABLE IF EXISTS item_topics");
+            db.execSQL("DROP TABLE IF EXISTS item_rows");
+            db.execSQL("DROP TABLE IF EXISTS item_history");
             db.execSQL("DROP TABLE IF EXISTS topics");
             db.execSQL("DROP TABLE IF EXISTS items");
             db.execSQL("DROP TABLE IF EXISTS item_groups");
@@ -36,13 +38,44 @@ public class ItemDbOpenHelper extends SQLiteOpenHelper {
     }
 
     private void createSchema(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE items (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT, created_at TEXT NOT NULL);");
-        db.execSQL("CREATE TABLE topics (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL UNIQUE);");
-        db.execSQL("CREATE TABLE item_topics (item_id INTEGER NOT NULL, topic_id INTEGER NOT NULL, PRIMARY KEY(item_id, topic_id), FOREIGN KEY(item_id) REFERENCES items(id) ON DELETE CASCADE, FOREIGN KEY(topic_id) REFERENCES topics(id) ON DELETE CASCADE);");
-        db.execSQL("CREATE TABLE item_history (id INTEGER PRIMARY KEY AUTOINCREMENT, item_id INTEGER NOT NULL, price REAL, observed_date TEXT, location TEXT, note TEXT, FOREIGN KEY(item_id) REFERENCES items(id) ON DELETE CASCADE);");
+        db.execSQL("CREATE TABLE items (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "title TEXT NOT NULL, " +
+                "body TEXT, " +
+                "created_at TEXT NOT NULL, " +
+                "updated_at TEXT NOT NULL" +
+                ");");
 
-        db.execSQL("CREATE INDEX idx_items_name ON items(name);");
-        db.execSQL("CREATE INDEX idx_history_item ON item_history(item_id);");
-        db.execSQL("CREATE INDEX idx_history_location ON item_history(location);");
+        db.execSQL("CREATE TABLE item_rows (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "item_id INTEGER NOT NULL, " +
+                "price REAL, " +
+                "location TEXT, " +
+                "entry_date TEXT, " +
+                "ranking TEXT, " +
+                "sort_order INTEGER NOT NULL DEFAULT 0, " +
+                "FOREIGN KEY(item_id) REFERENCES items(id) ON DELETE CASCADE" +
+                ");");
+
+        db.execSQL("CREATE TABLE item_topics (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "item_id INTEGER NOT NULL, " +
+                "topic TEXT NOT NULL, " +
+                "sort_order INTEGER NOT NULL DEFAULT 0, " +
+                "FOREIGN KEY(item_id) REFERENCES items(id) ON DELETE CASCADE" +
+                ");");
+
+        db.execSQL("CREATE TABLE item_progress (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "item_id INTEGER NOT NULL, " +
+                "progress_text TEXT NOT NULL, " +
+                "sort_order INTEGER NOT NULL DEFAULT 0, " +
+                "FOREIGN KEY(item_id) REFERENCES items(id) ON DELETE CASCADE" +
+                ");");
+
+        db.execSQL("CREATE INDEX idx_items_title ON items(title);");
+        db.execSQL("CREATE INDEX idx_item_rows_item ON item_rows(item_id);");
+        db.execSQL("CREATE INDEX idx_item_topics_item ON item_topics(item_id);");
+        db.execSQL("CREATE INDEX idx_item_progress_item ON item_progress(item_id);");
     }
 }

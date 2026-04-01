@@ -4,11 +4,9 @@
         android:label="Item DB"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".ItemsActivity" />
-        <activity android:name=".HistoryActivity" />
+        <activity android:name=".ItemEditorActivity" />
         <activity android:name=".SearchActivity" />
         <activity android:name=".ImportExportActivity" />
-        <activity android:name=".GraphActivity" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
