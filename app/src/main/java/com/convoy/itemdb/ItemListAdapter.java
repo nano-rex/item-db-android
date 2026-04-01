@@ -1,6 +1,7 @@
 package com.convoy.itemdb;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,7 +49,13 @@ public class ItemListAdapter extends BaseAdapter {
         ((TextView) view.findViewById(R.id.tvTitle)).setText(item.title);
         String body = item.body == null || item.body.trim().isEmpty() ? "No body text yet" : item.body.trim();
         ((TextView) view.findViewById(R.id.tvSummary)).setText(body);
-        ((TextView) view.findViewById(R.id.tvMeta)).setText(item.rowCount + " rows  •  " + item.topicCount + " topics");
+        ((TextView) view.findViewById(R.id.tvMeta)).setText(item.rowCount + " rows  •  " + item.topicCount + " tags");
+        View colorView = view.findViewById(R.id.viewColor);
+        try {
+            colorView.setBackgroundColor(Color.parseColor(item.colorHex == null ? "#E2E8F0" : item.colorHex));
+        } catch (IllegalArgumentException ignored) {
+            colorView.setBackgroundColor(Color.parseColor("#E2E8F0"));
+        }
         Button open = view.findViewById(R.id.btnOpen);
         Button delete = view.findViewById(R.id.btnDelete);
         open.setOnClickListener(v -> openListener.open(item));

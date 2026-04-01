@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class ItemDbOpenHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "itemdb.db";
-    private static final int DB_VERSION = 5;
+    private static final int DB_VERSION = 6;
 
     public ItemDbOpenHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -25,7 +25,7 @@ public class ItemDbOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion < 5) {
+        if (oldVersion < 6) {
             db.execSQL("DROP TABLE IF EXISTS item_progress");
             db.execSQL("DROP TABLE IF EXISTS item_topics");
             db.execSQL("DROP TABLE IF EXISTS item_rows");
@@ -42,6 +42,7 @@ public class ItemDbOpenHelper extends SQLiteOpenHelper {
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "title TEXT NOT NULL, " +
                 "body TEXT, " +
+                "color_hex TEXT, " +
                 "created_at TEXT NOT NULL, " +
                 "updated_at TEXT NOT NULL" +
                 ");");

@@ -6,6 +6,7 @@ public class ItemRecord {
     public String body;
     public String createdAt;
     public String updatedAt;
+    public String colorHex;
     public int rowCount;
     public int topicCount;
 }

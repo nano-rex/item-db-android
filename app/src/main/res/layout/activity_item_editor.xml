@@ -46,6 +46,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:text="Color"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/spColor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:text="Body"
             android:textStyle="bold" />
 
@@ -116,15 +128,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Topics"
+            android:text="Tags"
             android:textStyle="bold" />
 
         <Button
-            android:id="@+id/btnAddTopic"
+            android:id="@+id/btnAddTag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Add Topic" />
+            android:text="Add Tag" />
 
         <LinearLayout
             android:id="@+id/topicsContainer"

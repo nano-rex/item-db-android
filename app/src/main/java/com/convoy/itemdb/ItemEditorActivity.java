@@ -4,18 +4,29 @@ import android.app.AlertDialog;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class ItemEditorActivity extends AppCompatActivity {
+    private static final String[] COLOR_LABELS = new String[]{
+            "Slate", "Blue", "Green", "Amber", "Rose", "Lavender", "Gray"
+    };
+    private static final String[] COLOR_VALUES = new String[]{
+            "#E2E8F0", "#DBEAFE", "#DCFCE7", "#FEF3C7", "#FFE4E6", "#EDE9FE", "#E5E7EB"
+    };
+
     private ItemDbRepository repository;
     private long itemId;
     private EditText etTitle;
     private EditText etBody;
+    private Spinner spColor;
     private TextView tvStatus;
     private TextView tvMeta;
     private LinearLayout rowsContainer;
@@ -30,14 +41,16 @@ public class ItemEditorActivity extends AppCompatActivity {
         itemId = getIntent().getLongExtra("item_id", 0);
         etTitle = findViewById(R.id.etTitle);
         etBody = findViewById(R.id.etBody);
+        spColor = findViewById(R.id.spColor);
         tvStatus = findViewById(R.id.tvStatus);
         tvMeta = findViewById(R.id.tvMeta);
         rowsContainer = findViewById(R.id.rowsContainer);
         topicsContainer = findViewById(R.id.topicsContainer);
+        spColor.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, COLOR_LABELS));
 
         findViewById(R.id.btnSave).setOnClickListener(v -> saveItem());
         findViewById(R.id.btnAddRow).setOnClickListener(v -> showAddRowDialog());
-        findViewById(R.id.btnAddTopic).setOnClickListener(v -> showAddSimpleDialog("Add topic", "Topic", value -> repository.addTopic(itemId, value)));
+        findViewById(R.id.btnAddTag).setOnClickListener(v -> showAddTagDialog());
         findViewById(R.id.btnDeleteItem).setOnClickListener(v -> confirmDeleteItem());
 
         refresh();
@@ -52,7 +65,8 @@ public class ItemEditorActivity extends AppCompatActivity {
         ItemDetail detail = repository.getItemDetail(itemId);
         etTitle.setText(detail.item.title);
         etBody.setText(detail.item.body == null ? "" : detail.item.body);
-        tvMeta.setText("Rows: " + detail.item.rowCount + "   Topics: " + detail.item.topicCount);
+        spColor.setSelection(colorIndex(detail.item.colorHex));
+        tvMeta.setText("Rows: " + detail.item.rowCount + "   Tags: " + detail.item.topicCount);
         renderRows(detail);
         renderNamedEntries(topicsContainer, detail.topics);
     }
@@ -61,7 +75,7 @@ public class ItemEditorActivity extends AppCompatActivity {
         rowsContainer.removeAllViews();
         topicsContainer.removeAllViews();
         addPlaceholder(rowsContainer, "Save the note first, then add structured rows.");
-        addPlaceholder(topicsContainer, "Save the note first, then add topics.");
+        addPlaceholder(topicsContainer, "Save the note first, then add tags.");
     }
 
     private void saveItem() {
@@ -71,10 +85,10 @@ public class ItemEditorActivity extends AppCompatActivity {
             return;
         }
         if (itemId == 0) {
-            itemId = repository.createItem(title, etBody.getText().toString());
+            itemId = repository.createItem(title, etBody.getText().toString(), selectedColor());
             tvStatus.setText("Note created");
         } else {
-            repository.updateItem(itemId, title, etBody.getText().toString());
+            repository.updateItem(itemId, title, etBody.getText().toString(), selectedColor());
             tvStatus.setText("Note updated");
         }
         refresh();
@@ -87,7 +101,7 @@ public class ItemEditorActivity extends AppCompatActivity {
         }
         new AlertDialog.Builder(this)
                 .setTitle("Delete note")
-                .setMessage("Remove this note and all linked rows and topics?")
+                .setMessage("Remove this note and all linked rows and tags?")
                 .setPositiveButton("Delete", (dialog, which) -> {
                     repository.deleteItem(itemId);
                     finish();
@@ -97,6 +111,10 @@ public class ItemEditorActivity extends AppCompatActivity {
     }
 
     private void showAddRowDialog() {
+        showRowDialog(null);
+    }
+
+    private void showRowDialog(ItemRowEntry existingRow) {
         if (!ensureSaved()) return;
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -113,35 +131,55 @@ public class ItemEditorActivity extends AppCompatActivity {
         layout.addView(etDate);
         layout.addView(etRanking);
         layout.addView(etProgress);
+        if (existingRow != null) {
+            etPrice.setText(existingRow.hasPrice ? String.valueOf(existingRow.price) : "");
+            etLocation.setText(existingRow.location == null ? "" : existingRow.location);
+            etDate.setText(existingRow.entryDate == null ? "" : existingRow.entryDate);
+            etRanking.setText(existingRow.ranking == null ? "" : existingRow.ranking);
+            etProgress.setText(existingRow.progressText == null ? "" : existingRow.progressText);
+        }
 
         new AlertDialog.Builder(this)
-                .setTitle("Add structured row")
+                .setTitle(existingRow == null ? "Add structured row" : "Edit structured row")
                 .setView(layout)
-                .setPositiveButton("Add", (dialog, which) -> {
-                    repository.addRow(itemId,
-                            etPrice.getText().toString(),
-                            etLocation.getText().toString(),
-                            etDate.getText().toString(),
-                            etRanking.getText().toString(),
-                            etProgress.getText().toString());
-                    tvStatus.setText("Row added");
+                .setPositiveButton(existingRow == null ? "Add" : "Save", (dialog, which) -> {
+                    if (existingRow == null) {
+                        repository.addRow(itemId,
+                                etPrice.getText().toString(),
+                                etLocation.getText().toString(),
+                                etDate.getText().toString(),
+                                etRanking.getText().toString(),
+                                etProgress.getText().toString());
+                        tvStatus.setText("Row added");
+                    } else {
+                        repository.updateRow(existingRow.id,
+                                etPrice.getText().toString(),
+                                etLocation.getText().toString(),
+                                etDate.getText().toString(),
+                                etRanking.getText().toString(),
+                                etProgress.getText().toString());
+                        tvStatus.setText("Row updated");
+                    }
                     refresh();
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
     }
 
-    private void showAddSimpleDialog(String title, String hint, ValueConsumer consumer) {
+    private void showAddTagDialog() {
         if (!ensureSaved()) return;
-        EditText input = field(hint, InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        AutoCompleteTextView input = new AutoCompleteTextView(this);
+        input.setHint("Tag");
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        input.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, repository.listDistinctTags()));
         new AlertDialog.Builder(this)
-                .setTitle(title)
+                .setTitle("Add tag")
                 .setView(input)
                 .setPositiveButton("Add", (dialog, which) -> {
                     String value = input.getText().toString().trim();
                     if (!value.isEmpty()) {
-                        consumer.accept(value);
-                        tvStatus.setText(title + " saved");
+                        repository.addTag(itemId, value);
+                        tvStatus.setText("Tag saved");
                         refresh();
                     }
                 })
@@ -168,6 +206,7 @@ public class ItemEditorActivity extends AppCompatActivity {
                             "Date: " + dash(row.entryDate) + "\n" +
                             "Ranking: " + dash(row.ranking) + "\n" +
                             "Progress: " + dash(row.progressText),
+                    v -> showRowDialog(row),
                     v -> {
                         repository.deleteRow(row.id);
                         tvStatus.setText("Row removed");
@@ -179,19 +218,19 @@ public class ItemEditorActivity extends AppCompatActivity {
     private void renderNamedEntries(LinearLayout container, java.util.List<NamedEntry> entries) {
         container.removeAllViews();
         if (entries.isEmpty()) {
-            addPlaceholder(container, "No topics yet.");
+            addPlaceholder(container, "No tags yet.");
             return;
         }
         for (NamedEntry entry : entries) {
-            container.addView(buildRowView(entry.value, v -> {
-                repository.deleteTopic(entry.id);
-                tvStatus.setText("Topic removed");
+            container.addView(buildRowView(entry.value, null, v -> {
+                repository.deleteTag(entry.id);
+                tvStatus.setText("Tag removed");
                 refresh();
             }));
         }
     }
 
-    private View buildRowView(String text, View.OnClickListener deleteListener) {
+    private View buildRowView(String text, View.OnClickListener editListener, View.OnClickListener deleteListener) {
         LinearLayout row = new LinearLayout(this);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setPadding(dp(12), dp(10), dp(12), dp(10));
@@ -200,10 +239,18 @@ public class ItemEditorActivity extends AppCompatActivity {
         TextView tv = new TextView(this);
         tv.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         tv.setText(text);
+        if (editListener != null) {
+            Button edit = new Button(this);
+            edit.setText("Edit");
+            edit.setOnClickListener(editListener);
+            row.addView(tv);
+            row.addView(edit);
+        } else {
+            row.addView(tv);
+        }
         Button delete = new Button(this);
         delete.setText("Remove");
         delete.setOnClickListener(deleteListener);
-        row.addView(tv);
         row.addView(delete);
 
         LinearLayout wrapper = new LinearLayout(this);
@@ -236,5 +283,15 @@ public class ItemEditorActivity extends AppCompatActivity {
         return (int) (value * density);
     }
 
-    private interface ValueConsumer { void accept(String value); }
+    private String selectedColor() {
+        return COLOR_VALUES[Math.max(0, spColor.getSelectedItemPosition())];
+    }
+
+    private int colorIndex(String colorHex) {
+        if (colorHex == null) return 0;
+        for (int i = 0; i < COLOR_VALUES.length; i++) {
+            if (COLOR_VALUES[i].equalsIgnoreCase(colorHex)) return i;
+        }
+        return 0;
+    }
 }
