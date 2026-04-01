@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class ItemDbRepository {
     private final Context context;
@@ -157,6 +158,92 @@ public class ItemDbRepository {
         deleteNamedEntry("item_progress", entryId);
     }
 
+    public List<String> listDistinctTopics() {
+        ArrayList<String> result = new ArrayList<>();
+        Cursor c = db().rawQuery("SELECT DISTINCT topic FROM item_topics WHERE TRIM(topic) <> '' ORDER BY topic COLLATE NOCASE", new String[]{});
+        while (c.moveToNext()) {
+            result.add(c.getString(0));
+        }
+        c.close();
+        return result;
+    }
+
+    public List<String> listDistinctLocations() {
+        ArrayList<String> result = new ArrayList<>();
+        Cursor c = db().rawQuery("SELECT DISTINCT location FROM item_rows WHERE location IS NOT NULL AND TRIM(location) <> '' ORDER BY location COLLATE NOCASE", new String[]{});
+        while (c.moveToNext()) {
+            result.add(c.getString(0));
+        }
+        c.close();
+        return result;
+    }
+
+    public String buildAnalysisReport(String topicsText, String locationText, boolean matchAllTopics) {
+        List<String> topics = parseFilters(topicsText);
+        String location = locationText == null ? "" : locationText.trim();
+        List<ItemRecord> items = listItems("");
+        StringBuilder out = new StringBuilder();
+        out.append("Analysis\n");
+        out.append("Topics: ").append(topics.isEmpty() ? "Any" : String.join(", ", topics)).append("\n");
+        out.append("Topic mode: ").append(matchAllTopics ? "All selected topics" : "Any selected topic").append("\n");
+        out.append("Location: ").append(location.isEmpty() ? "Any" : location).append("\n\n");
+
+        int matchedItems = 0;
+        int matchedRows = 0;
+        for (ItemRecord item : items) {
+            ItemDetail detail = getItemDetail(item.id);
+            if (!matchesTopics(detail, topics, matchAllTopics)) {
+                continue;
+            }
+
+            List<ItemRowEntry> rows = new ArrayList<>();
+            for (ItemRowEntry row : detail.rows) {
+                if (location.isEmpty() || location.equalsIgnoreCase(safe(row.location))) {
+                    rows.add(row);
+                }
+            }
+            if (!location.isEmpty() && rows.isEmpty()) {
+                continue;
+            }
+
+            matchedItems++;
+            matchedRows += rows.size();
+
+            out.append(item.title).append("\n");
+            out.append("  Topics: ").append(joinValues(detail.topics)).append("\n");
+            out.append("  Rows matched: ").append(rows.size()).append("\n");
+            if (!rows.isEmpty()) {
+                ItemRowEntry latest = rows.get(rows.size() - 1);
+                out.append("  Latest price: ").append(latest.hasPrice ? formatPrice(latest.price) : "-").append("\n");
+                out.append("  Latest rank: ").append(safe(latest.ranking)).append("\n");
+                out.append("  Latest location: ").append(safe(latest.location)).append("\n");
+                out.append("  Latest date: ").append(safe(latest.entryDate)).append("\n");
+                out.append("  Timeline:\n");
+                for (ItemRowEntry row : rows) {
+                    out.append("    - ")
+                            .append(safe(row.entryDate))
+                            .append(" | ")
+                            .append(safe(row.location))
+                            .append(" | price ")
+                            .append(row.hasPrice ? formatPrice(row.price) : "-")
+                            .append(" | rank ")
+                            .append(safe(row.ranking))
+                            .append("\n");
+                }
+            }
+            out.append("\n");
+        }
+
+        if (matchedItems == 0) {
+            out.append("No matching items.");
+        } else {
+            out.append("Summary\n");
+            out.append("Matched items: ").append(matchedItems).append("\n");
+            out.append("Matched rows: ").append(matchedRows).append("\n");
+        }
+        return out.toString();
+    }
+
     public String exportJsonToFile() throws Exception {
         JSONObject root = new JSONObject();
         root.put("items", queryArray("SELECT id, title, body, created_at, updated_at FROM items ORDER BY id"));
@@ -165,7 +252,9 @@ public class ItemDbRepository {
         root.put("item_progress", queryArray("SELECT id, item_id, progress_text, sort_order FROM item_progress ORDER BY item_id, sort_order, id"));
 
         File outDir = new File(context.getFilesDir(), "exports");
-        if (!outDir.exists()) outDir.mkdirs();
+        if (!outDir.exists()) {
+            outDir.mkdirs();
+        }
         File outFile = new File(outDir, "itemdb_export.json");
         try (FileOutputStream fos = new FileOutputStream(outFile)) {
             fos.write(root.toString(2).getBytes(StandardCharsets.UTF_8));
@@ -231,13 +320,17 @@ public class ItemDbRepository {
     private void deleteNamedEntry(String table, long entryId) {
         long itemId = parentItemId(table, entryId);
         db().delete(table, "id = ?", new String[]{String.valueOf(entryId)});
-        if (itemId > 0) touchItem(itemId);
+        if (itemId > 0) {
+            touchItem(itemId);
+        }
     }
 
     private long parentItemId(String table, long entryId) {
         Cursor c = db().rawQuery("SELECT item_id FROM " + table + " WHERE id = ?", new String[]{String.valueOf(entryId)});
         long itemId = 0;
-        if (c.moveToFirst()) itemId = c.getLong(0);
+        if (c.moveToFirst()) {
+            itemId = c.getLong(0);
+        }
         c.close();
         return itemId;
     }
@@ -245,7 +338,9 @@ public class ItemDbRepository {
     private int nextSortOrder(String table, long itemId) {
         Cursor c = db().rawQuery("SELECT COALESCE(MAX(sort_order), -1) + 1 FROM " + table + " WHERE item_id = ?", new String[]{String.valueOf(itemId)});
         int value = 0;
-        if (c.moveToFirst()) value = c.getInt(0);
+        if (c.moveToFirst()) {
+            value = c.getInt(0);
+        }
         c.close();
         return value;
     }
@@ -272,9 +367,13 @@ public class ItemDbRepository {
                     o.put(col, JSONObject.NULL);
                 } else {
                     int type = c.getType(i);
-                    if (type == Cursor.FIELD_TYPE_INTEGER) o.put(col, c.getLong(i));
-                    else if (type == Cursor.FIELD_TYPE_FLOAT) o.put(col, c.getDouble(i));
-                    else o.put(col, c.getString(i));
+                    if (type == Cursor.FIELD_TYPE_INTEGER) {
+                        o.put(col, c.getLong(i));
+                    } else if (type == Cursor.FIELD_TYPE_FLOAT) {
+                        o.put(col, c.getDouble(i));
+                    } else {
+                        o.put(col, c.getString(i));
+                    }
                 }
             }
             arr.put(o);
@@ -284,10 +383,14 @@ public class ItemDbRepository {
     }
 
     private void insertArray(SQLiteDatabase db, JSONArray arr, String sql, String[] keys) {
-        if (arr == null) return;
+        if (arr == null) {
+            return;
+        }
         for (int i = 0; i < arr.length(); i++) {
             JSONObject o = arr.optJSONObject(i);
-            if (o == null) continue;
+            if (o == null) {
+                continue;
+            }
             Object[] args = new Object[keys.length];
             for (int k = 0; k < keys.length; k++) {
                 Object value = o.opt(keys[k]);
@@ -297,10 +400,69 @@ public class ItemDbRepository {
         }
     }
 
+    private List<String> parseFilters(String raw) {
+        ArrayList<String> result = new ArrayList<>();
+        if (raw == null) {
+            return result;
+        }
+        for (String part : raw.split(",")) {
+            String value = part.trim();
+            if (!value.isEmpty()) {
+                result.add(value);
+            }
+        }
+        return result;
+    }
+
+    private boolean matchesTopics(ItemDetail detail, List<String> filters, boolean matchAll) {
+        if (filters.isEmpty()) {
+            return true;
+        }
+        ArrayList<String> itemTopics = new ArrayList<>();
+        for (NamedEntry entry : detail.topics) {
+            itemTopics.add(entry.value == null ? "" : entry.value.trim().toLowerCase(Locale.US));
+        }
+        if (matchAll) {
+            for (String filter : filters) {
+                if (!itemTopics.contains(filter.toLowerCase(Locale.US))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        for (String filter : filters) {
+            if (itemTopics.contains(filter.toLowerCase(Locale.US))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String joinValues(List<NamedEntry> entries) {
+        if (entries.isEmpty()) {
+            return "-";
+        }
+        ArrayList<String> values = new ArrayList<>();
+        for (NamedEntry entry : entries) {
+            values.add(safe(entry.value));
+        }
+        return String.join(", ", values);
+    }
+
+    private String formatPrice(double value) {
+        return String.format(Locale.US, "%.2f", value);
+    }
+
     private Double parseDouble(String raw) {
         String value = raw == null ? "" : raw.trim();
-        if (value.isEmpty()) return null;
+        if (value.isEmpty()) {
+            return null;
+        }
         return Double.parseDouble(value);
+    }
+
+    private String safe(String value) {
+        return value == null || value.trim().isEmpty() ? "-" : value.trim();
     }
 
     private String emptyToNull(String value) {

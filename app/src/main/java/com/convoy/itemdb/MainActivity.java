@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.btnNewItem).setOnClickListener(v -> openEditor(0));
         findViewById(R.id.btnSearch).setOnClickListener(v -> startActivity(new Intent(this, SearchActivity.class)));
+        findViewById(R.id.btnAnalysis).setOnClickListener(v -> startActivity(new Intent(this, AnalysisActivity.class)));
         findViewById(R.id.btnImportExport).setOnClickListener(v -> startActivity(new Intent(this, ImportExportActivity.class)));
     }
 

@@ -4,6 +4,7 @@
         android:label="Item DB"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        <activity android:name=".AnalysisActivity" />
         <activity android:name=".ItemEditorActivity" />
         <activity android:name=".SearchActivity" />
         <activity android:name=".ImportExportActivity" />

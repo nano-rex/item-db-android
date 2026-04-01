@@ -37,6 +37,13 @@
                 android:text="Search" />
 
             <Button
+                android:id="@+id/btnAnalysis"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Analysis" />
+
+            <Button
                 android:id="@+id/btnImportExport"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
