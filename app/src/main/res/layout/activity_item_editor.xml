@@ -132,32 +132,5 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:orientation="vertical" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="16dp"
-            android:background="#CCCCCC" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Progress"
-            android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/btnAddProgress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Add Progress" />
-
-        <LinearLayout
-            android:id="@+id/progressContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="vertical" />
     </LinearLayout>
 </ScrollView>

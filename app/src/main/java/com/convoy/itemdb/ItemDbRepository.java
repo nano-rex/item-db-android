@@ -58,12 +58,11 @@ public class ItemDbRepository {
         Cursor c = db().rawQuery(
                 "SELECT i.id, i.title, i.body, i.created_at, i.updated_at, " +
                         "(SELECT COUNT(*) FROM item_rows r WHERE r.item_id = i.id), " +
-                        "(SELECT COUNT(*) FROM item_topics t WHERE t.item_id = i.id), " +
-                        "(SELECT COUNT(*) FROM item_progress p WHERE p.item_id = i.id) " +
+                        "(SELECT COUNT(*) FROM item_topics t WHERE t.item_id = i.id) " +
                         "FROM items i " +
                         "WHERE (? = '' OR i.title LIKE ? OR COALESCE(i.body, '') LIKE ? " +
                         "OR EXISTS (SELECT 1 FROM item_topics t2 WHERE t2.item_id = i.id AND t2.topic LIKE ?) " +
-                        "OR EXISTS (SELECT 1 FROM item_progress p2 WHERE p2.item_id = i.id AND p2.progress_text LIKE ?)) " +
+                        "OR EXISTS (SELECT 1 FROM item_rows r2 WHERE r2.item_id = i.id AND COALESCE(r2.progress_text, '') LIKE ?)) " +
                         "ORDER BY i.updated_at DESC, i.id DESC",
                 new String[]{term, like, like, like, like}
         );
@@ -76,7 +75,6 @@ public class ItemDbRepository {
             item.updatedAt = c.getString(4);
             item.rowCount = c.getInt(5);
             item.topicCount = c.getInt(6);
-            item.progressCount = c.getInt(7);
             result.add(item);
         }
         c.close();
@@ -99,7 +97,7 @@ public class ItemDbRepository {
         itemCursor.close();
 
         Cursor rowCursor = db().rawQuery(
-                "SELECT id, price, location, entry_date, ranking, sort_order FROM item_rows WHERE item_id = ? ORDER BY sort_order, id",
+                "SELECT id, price, location, entry_date, ranking, progress_text, sort_order FROM item_rows WHERE item_id = ? ORDER BY sort_order, id",
                 new String[]{String.valueOf(itemId)}
         );
         while (rowCursor.moveToNext()) {
@@ -110,20 +108,19 @@ public class ItemDbRepository {
             row.location = rowCursor.getString(2);
             row.entryDate = rowCursor.getString(3);
             row.ranking = rowCursor.getString(4);
-            row.sortOrder = rowCursor.getInt(5);
+            row.progressText = rowCursor.getString(5);
+            row.sortOrder = rowCursor.getInt(6);
             detail.rows.add(row);
         }
         rowCursor.close();
 
         detail.topics.addAll(readNamedEntries("item_topics", "topic", itemId));
-        detail.progressEntries.addAll(readNamedEntries("item_progress", "progress_text", itemId));
         detail.item.rowCount = detail.rows.size();
         detail.item.topicCount = detail.topics.size();
-        detail.item.progressCount = detail.progressEntries.size();
         return detail;
     }
 
-    public void addRow(long itemId, String priceText, String location, String entryDate, String ranking) {
+    public void addRow(long itemId, String priceText, String location, String entryDate, String ranking, String progressText) {
         ContentValues values = new ContentValues();
         values.put("item_id", itemId);
         Double price = parseDouble(priceText);
@@ -131,6 +128,7 @@ public class ItemDbRepository {
         values.put("location", emptyToNull(location));
         values.put("entry_date", emptyToNull(entryDate));
         values.put("ranking", emptyToNull(ranking));
+        values.put("progress_text", emptyToNull(progressText));
         values.put("sort_order", nextSortOrder("item_rows", itemId));
         db().insertOrThrow("item_rows", null, values);
         touchItem(itemId);
@@ -138,10 +136,6 @@ public class ItemDbRepository {
 
     public void addTopic(long itemId, String topic) {
         addNamedEntry("item_topics", "topic", itemId, topic);
-    }
-
-    public void addProgress(long itemId, String progressText) {
-        addNamedEntry("item_progress", "progress_text", itemId, progressText);
     }
 
     public void deleteRow(long rowId) {
@@ -152,10 +146,6 @@ public class ItemDbRepository {
 
     public void deleteTopic(long entryId) {
         deleteNamedEntry("item_topics", entryId);
-    }
-
-    public void deleteProgress(long entryId) {
-        deleteNamedEntry("item_progress", entryId);
     }
 
     public List<String> listDistinctTopics() {
@@ -190,6 +180,7 @@ public class ItemDbRepository {
 
         int matchedItems = 0;
         int matchedRows = 0;
+        int rowsWithProgress = 0;
         for (ItemRecord item : items) {
             ItemDetail detail = getItemDetail(item.id);
             if (!matchesTopics(detail, topics, matchAllTopics)) {
@@ -216,10 +207,14 @@ public class ItemDbRepository {
                 ItemRowEntry latest = rows.get(rows.size() - 1);
                 out.append("  Latest price: ").append(latest.hasPrice ? formatPrice(latest.price) : "-").append("\n");
                 out.append("  Latest rank: ").append(safe(latest.ranking)).append("\n");
+                out.append("  Latest progress: ").append(safe(latest.progressText)).append("\n");
                 out.append("  Latest location: ").append(safe(latest.location)).append("\n");
                 out.append("  Latest date: ").append(safe(latest.entryDate)).append("\n");
                 out.append("  Timeline:\n");
                 for (ItemRowEntry row : rows) {
+                    if (row.progressText != null && !row.progressText.trim().isEmpty()) {
+                        rowsWithProgress++;
+                    }
                     out.append("    - ")
                             .append(safe(row.entryDate))
                             .append(" | ")
@@ -228,6 +223,8 @@ public class ItemDbRepository {
                             .append(row.hasPrice ? formatPrice(row.price) : "-")
                             .append(" | rank ")
                             .append(safe(row.ranking))
+                            .append(" | progress ")
+                            .append(safe(row.progressText))
                             .append("\n");
                 }
             }
@@ -240,6 +237,7 @@ public class ItemDbRepository {
             out.append("Summary\n");
             out.append("Matched items: ").append(matchedItems).append("\n");
             out.append("Matched rows: ").append(matchedRows).append("\n");
+            out.append("Rows with progress updates: ").append(rowsWithProgress).append("\n");
         }
         return out.toString();
     }
@@ -247,9 +245,8 @@ public class ItemDbRepository {
     public String exportJsonToFile() throws Exception {
         JSONObject root = new JSONObject();
         root.put("items", queryArray("SELECT id, title, body, created_at, updated_at FROM items ORDER BY id"));
-        root.put("item_rows", queryArray("SELECT id, item_id, price, location, entry_date, ranking, sort_order FROM item_rows ORDER BY item_id, sort_order, id"));
+        root.put("item_rows", queryArray("SELECT id, item_id, price, location, entry_date, ranking, progress_text, sort_order FROM item_rows ORDER BY item_id, sort_order, id"));
         root.put("item_topics", queryArray("SELECT id, item_id, topic, sort_order FROM item_topics ORDER BY item_id, sort_order, id"));
-        root.put("item_progress", queryArray("SELECT id, item_id, progress_text, sort_order FROM item_progress ORDER BY item_id, sort_order, id"));
 
         File outDir = new File(context.getFilesDir(), "exports");
         if (!outDir.exists()) {
@@ -266,8 +263,7 @@ public class ItemDbRepository {
         JSONObject parsed = new JSONObject(json);
         return "Import preview ready. items=" + length(parsed, "items") +
                 " rows=" + length(parsed, "item_rows") +
-                " topics=" + length(parsed, "item_topics") +
-                " progress=" + length(parsed, "item_progress");
+                " topics=" + length(parsed, "item_topics");
     }
 
     public void importJson(String json, boolean replaceFirst) throws Exception {
@@ -276,15 +272,13 @@ public class ItemDbRepository {
         db.beginTransaction();
         try {
             if (replaceFirst) {
-                db.execSQL("DELETE FROM item_progress");
                 db.execSQL("DELETE FROM item_topics");
                 db.execSQL("DELETE FROM item_rows");
                 db.execSQL("DELETE FROM items");
             }
             insertArray(db, parsed.optJSONArray("items"), "INSERT OR IGNORE INTO items(id, title, body, created_at, updated_at) VALUES(?, ?, ?, ?, ?)", new String[]{"id", "title", "body", "created_at", "updated_at"});
-            insertArray(db, parsed.optJSONArray("item_rows"), "INSERT OR IGNORE INTO item_rows(id, item_id, price, location, entry_date, ranking, sort_order) VALUES(?, ?, ?, ?, ?, ?, ?)", new String[]{"id", "item_id", "price", "location", "entry_date", "ranking", "sort_order"});
+            insertArray(db, parsed.optJSONArray("item_rows"), "INSERT OR IGNORE INTO item_rows(id, item_id, price, location, entry_date, ranking, progress_text, sort_order) VALUES(?, ?, ?, ?, ?, ?, ?, ?)", new String[]{"id", "item_id", "price", "location", "entry_date", "ranking", "progress_text", "sort_order"});
             insertArray(db, parsed.optJSONArray("item_topics"), "INSERT OR IGNORE INTO item_topics(id, item_id, topic, sort_order) VALUES(?, ?, ?, ?)", new String[]{"id", "item_id", "topic", "sort_order"});
-            insertArray(db, parsed.optJSONArray("item_progress"), "INSERT OR IGNORE INTO item_progress(id, item_id, progress_text, sort_order) VALUES(?, ?, ?, ?)", new String[]{"id", "item_id", "progress_text", "sort_order"});
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();

@@ -8,5 +8,4 @@ public class ItemRecord {
     public String updatedAt;
     public int rowCount;
     public int topicCount;
-    public int progressCount;
 }

@@ -7,5 +7,6 @@ public class ItemRowEntry {
     public String location;
     public String entryDate;
     public String ranking;
+    public String progressText;
     public int sortOrder;
 }

@@ -20,7 +20,6 @@ public class ItemEditorActivity extends AppCompatActivity {
     private TextView tvMeta;
     private LinearLayout rowsContainer;
     private LinearLayout topicsContainer;
-    private LinearLayout progressContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,12 +34,10 @@ public class ItemEditorActivity extends AppCompatActivity {
         tvMeta = findViewById(R.id.tvMeta);
         rowsContainer = findViewById(R.id.rowsContainer);
         topicsContainer = findViewById(R.id.topicsContainer);
-        progressContainer = findViewById(R.id.progressContainer);
 
         findViewById(R.id.btnSave).setOnClickListener(v -> saveItem());
         findViewById(R.id.btnAddRow).setOnClickListener(v -> showAddRowDialog());
         findViewById(R.id.btnAddTopic).setOnClickListener(v -> showAddSimpleDialog("Add topic", "Topic", value -> repository.addTopic(itemId, value)));
-        findViewById(R.id.btnAddProgress).setOnClickListener(v -> showAddSimpleDialog("Add progress", "Progress update", value -> repository.addProgress(itemId, value)));
         findViewById(R.id.btnDeleteItem).setOnClickListener(v -> confirmDeleteItem());
 
         refresh();
@@ -55,19 +52,16 @@ public class ItemEditorActivity extends AppCompatActivity {
         ItemDetail detail = repository.getItemDetail(itemId);
         etTitle.setText(detail.item.title);
         etBody.setText(detail.item.body == null ? "" : detail.item.body);
-        tvMeta.setText("Rows: " + detail.item.rowCount + "   Topics: " + detail.item.topicCount + "   Progress: " + detail.item.progressCount);
+        tvMeta.setText("Rows: " + detail.item.rowCount + "   Topics: " + detail.item.topicCount);
         renderRows(detail);
-        renderNamedEntries(topicsContainer, detail.topics, true);
-        renderNamedEntries(progressContainer, detail.progressEntries, false);
+        renderNamedEntries(topicsContainer, detail.topics);
     }
 
     private void renderEmptySections() {
         rowsContainer.removeAllViews();
         topicsContainer.removeAllViews();
-        progressContainer.removeAllViews();
         addPlaceholder(rowsContainer, "Save the note first, then add structured rows.");
         addPlaceholder(topicsContainer, "Save the note first, then add topics.");
-        addPlaceholder(progressContainer, "Save the note first, then add progress updates.");
     }
 
     private void saveItem() {
@@ -93,7 +87,7 @@ public class ItemEditorActivity extends AppCompatActivity {
         }
         new AlertDialog.Builder(this)
                 .setTitle("Delete note")
-                .setMessage("Remove this note and all linked rows, topics, and progress entries?")
+                .setMessage("Remove this note and all linked rows and topics?")
                 .setPositiveButton("Delete", (dialog, which) -> {
                     repository.deleteItem(itemId);
                     finish();
@@ -113,10 +107,12 @@ public class ItemEditorActivity extends AppCompatActivity {
         EditText etLocation = field("Location", InputType.TYPE_CLASS_TEXT);
         EditText etDate = field("Date", InputType.TYPE_CLASS_DATETIME);
         EditText etRanking = field("Ranking", InputType.TYPE_CLASS_TEXT);
+        EditText etProgress = field("Progress", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
         layout.addView(etPrice);
         layout.addView(etLocation);
         layout.addView(etDate);
         layout.addView(etRanking);
+        layout.addView(etProgress);
 
         new AlertDialog.Builder(this)
                 .setTitle("Add structured row")
@@ -126,7 +122,8 @@ public class ItemEditorActivity extends AppCompatActivity {
                             etPrice.getText().toString(),
                             etLocation.getText().toString(),
                             etDate.getText().toString(),
-                            etRanking.getText().toString());
+                            etRanking.getText().toString(),
+                            etProgress.getText().toString());
                     tvStatus.setText("Row added");
                     refresh();
                 })
@@ -169,7 +166,8 @@ public class ItemEditorActivity extends AppCompatActivity {
                     (row.hasPrice ? "Price: " + row.price : "Price: -") + "\n" +
                             "Location: " + dash(row.location) + "\n" +
                             "Date: " + dash(row.entryDate) + "\n" +
-                            "Ranking: " + dash(row.ranking),
+                            "Ranking: " + dash(row.ranking) + "\n" +
+                            "Progress: " + dash(row.progressText),
                     v -> {
                         repository.deleteRow(row.id);
                         tvStatus.setText("Row removed");
@@ -178,21 +176,16 @@ public class ItemEditorActivity extends AppCompatActivity {
         }
     }
 
-    private void renderNamedEntries(LinearLayout container, java.util.List<NamedEntry> entries, boolean topic) {
+    private void renderNamedEntries(LinearLayout container, java.util.List<NamedEntry> entries) {
         container.removeAllViews();
         if (entries.isEmpty()) {
-            addPlaceholder(container, topic ? "No topics yet." : "No progress entries yet.");
+            addPlaceholder(container, "No topics yet.");
             return;
         }
         for (NamedEntry entry : entries) {
             container.addView(buildRowView(entry.value, v -> {
-                if (topic) {
-                    repository.deleteTopic(entry.id);
-                    tvStatus.setText("Topic removed");
-                } else {
-                    repository.deleteProgress(entry.id);
-                    tvStatus.setText("Progress removed");
-                }
+                repository.deleteTopic(entry.id);
+                tvStatus.setText("Topic removed");
                 refresh();
             }));
         }

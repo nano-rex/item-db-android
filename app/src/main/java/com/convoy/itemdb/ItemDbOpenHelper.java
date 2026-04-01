@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class ItemDbOpenHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "itemdb.db";
-    private static final int DB_VERSION = 4;
+    private static final int DB_VERSION = 5;
 
     public ItemDbOpenHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -25,7 +25,7 @@ public class ItemDbOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion < 4) {
+        if (oldVersion < 5) {
             db.execSQL("DROP TABLE IF EXISTS item_progress");
             db.execSQL("DROP TABLE IF EXISTS item_topics");
             db.execSQL("DROP TABLE IF EXISTS item_rows");
@@ -53,6 +53,7 @@ public class ItemDbOpenHelper extends SQLiteOpenHelper {
                 "location TEXT, " +
                 "entry_date TEXT, " +
                 "ranking TEXT, " +
+                "progress_text TEXT, " +
                 "sort_order INTEGER NOT NULL DEFAULT 0, " +
                 "FOREIGN KEY(item_id) REFERENCES items(id) ON DELETE CASCADE" +
                 ");");
@@ -65,17 +66,8 @@ public class ItemDbOpenHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(item_id) REFERENCES items(id) ON DELETE CASCADE" +
                 ");");
 
-        db.execSQL("CREATE TABLE item_progress (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "item_id INTEGER NOT NULL, " +
-                "progress_text TEXT NOT NULL, " +
-                "sort_order INTEGER NOT NULL DEFAULT 0, " +
-                "FOREIGN KEY(item_id) REFERENCES items(id) ON DELETE CASCADE" +
-                ");");
-
         db.execSQL("CREATE INDEX idx_items_title ON items(title);");
         db.execSQL("CREATE INDEX idx_item_rows_item ON item_rows(item_id);");
         db.execSQL("CREATE INDEX idx_item_topics_item ON item_topics(item_id);");
-        db.execSQL("CREATE INDEX idx_item_progress_item ON item_progress(item_id);");
     }
 }
