@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Graph" android:textSize="24sp" android:textStyle="bold" />
+        <TextView android:id="@+id/tvStatus" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Ready" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="Item" />
+        <AutoCompleteTextView android:id="@+id/etGraphItemId" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Select item" />
+        <Button android:id="@+id/btnGraph" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Render Graph" />
+        <TextView android:id="@+id/tvOutput" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:textIsSelectable="true" android:typeface="monospace" />
+    </LinearLayout>
+</ScrollView>

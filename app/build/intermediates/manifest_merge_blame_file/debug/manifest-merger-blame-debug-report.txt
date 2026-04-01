@@ -1,0 +1,136 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.convoy.itemdb"
+4    android:versionCode="1"
+5    android:versionName="0.1.0-alpha" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="26"
+9        android:targetSdkVersion="34" />
+10
+11    <permission
+11-->[androidx.core:core:1.13.0] /tmp/gradle-user-home/caches/transforms-3/88bf09366140bc7b690589c55130748f/transformed/core-1.13.0/AndroidManifest.xml:22:5-24:47
+12        android:name="com.convoy.itemdb.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+12-->[androidx.core:core:1.13.0] /tmp/gradle-user-home/caches/transforms-3/88bf09366140bc7b690589c55130748f/transformed/core-1.13.0/AndroidManifest.xml:23:9-81
+13        android:protectionLevel="signature" />
+13-->[androidx.core:core:1.13.0] /tmp/gradle-user-home/caches/transforms-3/88bf09366140bc7b690589c55130748f/transformed/core-1.13.0/AndroidManifest.xml:24:9-44
+14
+15    <uses-permission android:name="com.convoy.itemdb.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+15-->[androidx.core:core:1.13.0] /tmp/gradle-user-home/caches/transforms-3/88bf09366140bc7b690589c55130748f/transformed/core-1.13.0/AndroidManifest.xml:26:5-97
+15-->[androidx.core:core:1.13.0] /tmp/gradle-user-home/caches/transforms-3/88bf09366140bc7b690589c55130748f/transformed/core-1.13.0/AndroidManifest.xml:26:22-94
+16
+17    <application
+17-->/home/user/Downloads/Item_DB_Android/app/src/main/AndroidManifest.xml:2:5-20:19
+18        android:allowBackup="true"
+18-->/home/user/Downloads/Item_DB_Android/app/src/main/AndroidManifest.xml:3:9-35
+19        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+19-->[androidx.core:core:1.13.0] /tmp/gradle-user-home/caches/transforms-3/88bf09366140bc7b690589c55130748f/transformed/core-1.13.0/AndroidManifest.xml:28:18-86
+20        android:debuggable="true"
+21        android:extractNativeLibs="false"
+22        android:label="Item DB"
+22-->/home/user/Downloads/Item_DB_Android/app/src/main/AndroidManifest.xml:4:9-32
+23        android:supportsRtl="true"
+23-->/home/user/Downloads/Item_DB_Android/app/src/main/AndroidManifest.xml:5:9-35
+24        android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
+24-->/home/user/Downloads/Item_DB_Android/app/src/main/AndroidManifest.xml:6:9-65
+25        <activity android:name="com.convoy.itemdb.ItemsActivity" />
+25-->/home/user/Downloads/Item_DB_Android/app/src/main/AndroidManifest.xml:7:9-51
+25-->/home/user/Downloads/Item_DB_Android/app/src/main/AndroidManifest.xml:7:19-48
+26        <activity android:name="com.convoy.itemdb.HistoryActivity" />
+26-->/home/user/Downloads/Item_DB_Android/app/src/main/AndroidManifest.xml:8:9-53
+26-->/home/user/Downloads/Item_DB_Android/app/src/main/AndroidManifest.xml:8:19-50
+27        <activity android:name="com.convoy.itemdb.SearchActivity" />
+27-->/home/user/Downloads/Item_DB_Android/app/src/main/AndroidManifest.xml:9:9-52
+27-->/home/user/Downloads/Item_DB_Android/app/src/main/AndroidManifest.xml:9:19-49
+28        <activity android:name="com.convoy.itemdb.ImportExportActivity" />
+28-->/home/user/Downloads/Item_DB_Android/app/src/main/AndroidManifest.xml:10:9-58
+28-->/home/user/Downloads/Item_DB_Android/app/src/main/AndroidManifest.xml:10:19-55
+29        <activity android:name="com.convoy.itemdb.GraphActivity" />
+29-->/home/user/Downloads/Item_DB_Android/app/src/main/AndroidManifest.xml:11:9-51
+29-->/home/user/Downloads/Item_DB_Android/app/src/main/AndroidManifest.xml:11:19-48
+30        <activity
+30-->/home/user/Downloads/Item_DB_Android/app/src/main/AndroidManifest.xml:12:9-19:20
+31            android:name="com.convoy.itemdb.MainActivity"
+31-->/home/user/Downloads/Item_DB_Android/app/src/main/AndroidManifest.xml:13:13-41
+32            android:exported="true" >
+32-->/home/user/Downloads/Item_DB_Android/app/src/main/AndroidManifest.xml:14:13-36
+33            <intent-filter>
+33-->/home/user/Downloads/Item_DB_Android/app/src/main/AndroidManifest.xml:15:13-18:29
+34                <action android:name="android.intent.action.MAIN" />
+34-->/home/user/Downloads/Item_DB_Android/app/src/main/AndroidManifest.xml:16:17-69
+34-->/home/user/Downloads/Item_DB_Android/app/src/main/AndroidManifest.xml:16:25-66
+35
+36                <category android:name="android.intent.category.LAUNCHER" />
+36-->/home/user/Downloads/Item_DB_Android/app/src/main/AndroidManifest.xml:17:17-77
+36-->/home/user/Downloads/Item_DB_Android/app/src/main/AndroidManifest.xml:17:27-74
+37            </intent-filter>
+38        </activity>
+39
+40        <provider
+40-->[androidx.emoji2:emoji2:1.3.0] /tmp/gradle-user-home/caches/transforms-3/3848e89a9b8479d5541c29795382fc1e/transformed/emoji2-1.3.0/AndroidManifest.xml:24:9-32:20
+41            android:name="androidx.startup.InitializationProvider"
+41-->[androidx.emoji2:emoji2:1.3.0] /tmp/gradle-user-home/caches/transforms-3/3848e89a9b8479d5541c29795382fc1e/transformed/emoji2-1.3.0/AndroidManifest.xml:25:13-67
+42            android:authorities="com.convoy.itemdb.androidx-startup"
+42-->[androidx.emoji2:emoji2:1.3.0] /tmp/gradle-user-home/caches/transforms-3/3848e89a9b8479d5541c29795382fc1e/transformed/emoji2-1.3.0/AndroidManifest.xml:26:13-68
+43            android:exported="false" >
+43-->[androidx.emoji2:emoji2:1.3.0] /tmp/gradle-user-home/caches/transforms-3/3848e89a9b8479d5541c29795382fc1e/transformed/emoji2-1.3.0/AndroidManifest.xml:27:13-37
+44            <meta-data
+44-->[androidx.emoji2:emoji2:1.3.0] /tmp/gradle-user-home/caches/transforms-3/3848e89a9b8479d5541c29795382fc1e/transformed/emoji2-1.3.0/AndroidManifest.xml:29:13-31:52
+45                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+45-->[androidx.emoji2:emoji2:1.3.0] /tmp/gradle-user-home/caches/transforms-3/3848e89a9b8479d5541c29795382fc1e/transformed/emoji2-1.3.0/AndroidManifest.xml:30:17-75
+46                android:value="androidx.startup" />
+46-->[androidx.emoji2:emoji2:1.3.0] /tmp/gradle-user-home/caches/transforms-3/3848e89a9b8479d5541c29795382fc1e/transformed/emoji2-1.3.0/AndroidManifest.xml:31:17-49
+47            <meta-data
+47-->[androidx.lifecycle:lifecycle-process:2.6.2] /tmp/gradle-user-home/caches/transforms-3/8a986538f65011dd7ecaf04f180ee21c/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:29:13-31:52
+48                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+48-->[androidx.lifecycle:lifecycle-process:2.6.2] /tmp/gradle-user-home/caches/transforms-3/8a986538f65011dd7ecaf04f180ee21c/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:30:17-78
+49                android:value="androidx.startup" />
+49-->[androidx.lifecycle:lifecycle-process:2.6.2] /tmp/gradle-user-home/caches/transforms-3/8a986538f65011dd7ecaf04f180ee21c/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:31:17-49
+50            <meta-data
+50-->[androidx.profileinstaller:profileinstaller:1.3.1] /tmp/gradle-user-home/caches/transforms-3/9197fa17bd55ef051426ec80381226b5/transformed/profileinstaller-1.3.1/AndroidManifest.xml:29:13-31:52
+51                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+51-->[androidx.profileinstaller:profileinstaller:1.3.1] /tmp/gradle-user-home/caches/transforms-3/9197fa17bd55ef051426ec80381226b5/transformed/profileinstaller-1.3.1/AndroidManifest.xml:30:17-85
+52                android:value="androidx.startup" />
+52-->[androidx.profileinstaller:profileinstaller:1.3.1] /tmp/gradle-user-home/caches/transforms-3/9197fa17bd55ef051426ec80381226b5/transformed/profileinstaller-1.3.1/AndroidManifest.xml:31:17-49
+53        </provider>
+54
+55        <receiver
+55-->[androidx.profileinstaller:profileinstaller:1.3.1] /tmp/gradle-user-home/caches/transforms-3/9197fa17bd55ef051426ec80381226b5/transformed/profileinstaller-1.3.1/AndroidManifest.xml:34:9-52:20
+56            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+56-->[androidx.profileinstaller:profileinstaller:1.3.1] /tmp/gradle-user-home/caches/transforms-3/9197fa17bd55ef051426ec80381226b5/transformed/profileinstaller-1.3.1/AndroidManifest.xml:35:13-76
+57            android:directBootAware="false"
+57-->[androidx.profileinstaller:profileinstaller:1.3.1] /tmp/gradle-user-home/caches/transforms-3/9197fa17bd55ef051426ec80381226b5/transformed/profileinstaller-1.3.1/AndroidManifest.xml:36:13-44
+58            android:enabled="true"
+58-->[androidx.profileinstaller:profileinstaller:1.3.1] /tmp/gradle-user-home/caches/transforms-3/9197fa17bd55ef051426ec80381226b5/transformed/profileinstaller-1.3.1/AndroidManifest.xml:37:13-35
+59            android:exported="true"
+59-->[androidx.profileinstaller:profileinstaller:1.3.1] /tmp/gradle-user-home/caches/transforms-3/9197fa17bd55ef051426ec80381226b5/transformed/profileinstaller-1.3.1/AndroidManifest.xml:38:13-36
+60            android:permission="android.permission.DUMP" >
+60-->[androidx.profileinstaller:profileinstaller:1.3.1] /tmp/gradle-user-home/caches/transforms-3/9197fa17bd55ef051426ec80381226b5/transformed/profileinstaller-1.3.1/AndroidManifest.xml:39:13-57
+61            <intent-filter>
+61-->[androidx.profileinstaller:profileinstaller:1.3.1] /tmp/gradle-user-home/caches/transforms-3/9197fa17bd55ef051426ec80381226b5/transformed/profileinstaller-1.3.1/AndroidManifest.xml:40:13-42:29
+62                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+62-->[androidx.profileinstaller:profileinstaller:1.3.1] /tmp/gradle-user-home/caches/transforms-3/9197fa17bd55ef051426ec80381226b5/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:17-91
+62-->[androidx.profileinstaller:profileinstaller:1.3.1] /tmp/gradle-user-home/caches/transforms-3/9197fa17bd55ef051426ec80381226b5/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:25-88
+63            </intent-filter>
+64            <intent-filter>
+64-->[androidx.profileinstaller:profileinstaller:1.3.1] /tmp/gradle-user-home/caches/transforms-3/9197fa17bd55ef051426ec80381226b5/transformed/profileinstaller-1.3.1/AndroidManifest.xml:43:13-45:29
+65                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+65-->[androidx.profileinstaller:profileinstaller:1.3.1] /tmp/gradle-user-home/caches/transforms-3/9197fa17bd55ef051426ec80381226b5/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:17-85
+65-->[androidx.profileinstaller:profileinstaller:1.3.1] /tmp/gradle-user-home/caches/transforms-3/9197fa17bd55ef051426ec80381226b5/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:25-82
+66            </intent-filter>
+67            <intent-filter>
+67-->[androidx.profileinstaller:profileinstaller:1.3.1] /tmp/gradle-user-home/caches/transforms-3/9197fa17bd55ef051426ec80381226b5/transformed/profileinstaller-1.3.1/AndroidManifest.xml:46:13-48:29
+68                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+68-->[androidx.profileinstaller:profileinstaller:1.3.1] /tmp/gradle-user-home/caches/transforms-3/9197fa17bd55ef051426ec80381226b5/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:17-88
+68-->[androidx.profileinstaller:profileinstaller:1.3.1] /tmp/gradle-user-home/caches/transforms-3/9197fa17bd55ef051426ec80381226b5/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:25-85
+69            </intent-filter>
+70            <intent-filter>
+70-->[androidx.profileinstaller:profileinstaller:1.3.1] /tmp/gradle-user-home/caches/transforms-3/9197fa17bd55ef051426ec80381226b5/transformed/profileinstaller-1.3.1/AndroidManifest.xml:49:13-51:29
+71                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+71-->[androidx.profileinstaller:profileinstaller:1.3.1] /tmp/gradle-user-home/caches/transforms-3/9197fa17bd55ef051426ec80381226b5/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:17-95
+71-->[androidx.profileinstaller:profileinstaller:1.3.1] /tmp/gradle-user-home/caches/transforms-3/9197fa17bd55ef051426ec80381226b5/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:25-92
+72            </intent-filter>
+73        </receiver>
+74    </application>
+75
+76</manifest>

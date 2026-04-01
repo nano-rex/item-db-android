@@ -1,0 +1,48 @@
+package com.convoy.itemdb;
+
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class ItemDbOpenHelper extends SQLiteOpenHelper {
+    private static final String DB_NAME = "itemdb.db";
+    private static final int DB_VERSION = 3;
+
+    public ItemDbOpenHelper(Context context) {
+        super(context, DB_NAME, null, DB_VERSION);
+    }
+
+    @Override
+    public void onConfigure(SQLiteDatabase db) {
+        super.onConfigure(db);
+        db.setForeignKeyConstraintsEnabled(true);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        createSchema(db);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        if (oldVersion < 3) {
+            db.execSQL("DROP TABLE IF EXISTS item_history");
+            db.execSQL("DROP TABLE IF EXISTS item_topics");
+            db.execSQL("DROP TABLE IF EXISTS topics");
+            db.execSQL("DROP TABLE IF EXISTS items");
+            db.execSQL("DROP TABLE IF EXISTS item_groups");
+            createSchema(db);
+        }
+    }
+
+    private void createSchema(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE items (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT, created_at TEXT NOT NULL);");
+        db.execSQL("CREATE TABLE topics (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL UNIQUE);");
+        db.execSQL("CREATE TABLE item_topics (item_id INTEGER NOT NULL, topic_id INTEGER NOT NULL, PRIMARY KEY(item_id, topic_id), FOREIGN KEY(item_id) REFERENCES items(id) ON DELETE CASCADE, FOREIGN KEY(topic_id) REFERENCES topics(id) ON DELETE CASCADE);");
+        db.execSQL("CREATE TABLE item_history (id INTEGER PRIMARY KEY AUTOINCREMENT, item_id INTEGER NOT NULL, price REAL, observed_date TEXT, location TEXT, note TEXT, FOREIGN KEY(item_id) REFERENCES items(id) ON DELETE CASCADE);");
+
+        db.execSQL("CREATE INDEX idx_items_name ON items(name);");
+        db.execSQL("CREATE INDEX idx_history_item ON item_history(item_id);");
+        db.execSQL("CREATE INDEX idx_history_location ON item_history(location);");
+    }
+}
