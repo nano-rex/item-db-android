@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openAnalysis() {
-        Intent intent = new Intent(this, SearchActivity.class);
+        Intent intent = new Intent(this, AnalysisActivity.class);
         intent.putExtra("query", etQuickSearch.getText().toString());
         intent.putExtra("tags", String.join(", ", selectedTags));
         intent.putExtra("location", filterLocation);

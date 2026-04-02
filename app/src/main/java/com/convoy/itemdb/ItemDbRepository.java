@@ -287,25 +287,32 @@ public class ItemDbRepository {
         List<String> tags = parseFilters(tagsText);
         String location = locationText == null ? "" : locationText.trim();
         List<ItemRecord> items = listItemsFiltered(query, tagsText, locationText, colorHex, matchAllTags);
-        ChartLineSeries best = new ChartLineSeries();
-        int bestCount = 0;
+        ChartLineSeries grouped = new ChartLineSeries();
+        java.util.LinkedHashMap<String, double[]> byDate = new java.util.LinkedHashMap<>();
         for (ItemRecord item : items) {
             ItemDetail detail = getItemDetail(item.id);
             if (!matchesTags(detail, tags, matchAllTags)) continue;
-            ArrayList<ChartLinePoint> points = new ArrayList<>();
             for (ItemRowEntry row : detail.rows) {
                 if (!row.hasPrice) continue;
                 if (!location.isEmpty() && !location.equalsIgnoreCase(safe(row.location))) continue;
-                points.add(new ChartLinePoint(safe(row.entryDate), row.price));
-            }
-            if (points.size() > bestCount) {
-                bestCount = points.size();
-                best.title = item.title;
-                best.points.clear();
-                best.points.addAll(points);
+                String label = safe(row.entryDate);
+                if (label.isEmpty() || "-".equals(label)) continue;
+                double[] aggregate = byDate.get(label);
+                if (aggregate == null) {
+                    aggregate = new double[]{0d, 0d};
+                    byDate.put(label, aggregate);
+                }
+                aggregate[0] += row.price;
+                aggregate[1] += 1d;
             }
         }
-        return best;
+        grouped.title = "Group average";
+        for (java.util.Map.Entry<String, double[]> entry : byDate.entrySet()) {
+            double[] aggregate = entry.getValue();
+            if (aggregate[1] <= 0d) continue;
+            grouped.points.add(new ChartLinePoint(entry.getKey(), aggregate[0] / aggregate[1]));
+        }
+        return grouped;
     }
 
     public String buildItemAnalysisReport(long itemId) {

@@ -2,6 +2,7 @@ package com.convoy.itemdb;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.InputType;
@@ -299,11 +300,25 @@ public class ItemEditorActivity extends AppCompatActivity {
         LinearLayout row = new LinearLayout(this);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setPadding(dp(12), dp(10), dp(12), dp(10));
-        row.setBackgroundResource(android.R.drawable.dialog_holo_light_frame);
+        boolean darkMode = ThemePreferences.isDarkMode(this);
+        int baseColor = ColorThemeUtil.parseOrDefault(selectedColor(), "#E2E8F0");
+        int surfaceColor = darkMode
+                ? ColorThemeUtil.blendTowardBlack(baseColor, 0.62f)
+                : ColorThemeUtil.blendTowardWhite(baseColor, 0.58f);
+        int strokeColor = darkMode
+                ? ColorThemeUtil.blendTowardBlack(baseColor, 0.82f)
+                : ColorThemeUtil.darken(baseColor, 0.18f);
+        int textColor = ColorThemeUtil.idealTextColor(surfaceColor);
+        android.graphics.drawable.GradientDrawable background = new android.graphics.drawable.GradientDrawable();
+        background.setColor(surfaceColor);
+        background.setCornerRadius(dp(8));
+        background.setStroke(dp(1), strokeColor);
+        row.setBackground(background);
 
         TextView tv = new TextView(this);
         tv.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         tv.setText(text);
+        tv.setTextColor(textColor);
         if (editListener != null) {
             Button edit = new Button(this);
             edit.setText("Edit");
@@ -328,6 +343,7 @@ public class ItemEditorActivity extends AppCompatActivity {
     private void addPlaceholder(LinearLayout container, String text) {
         TextView tv = new TextView(this);
         tv.setText(text);
+        tv.setTextColor(ThemePreferences.isDarkMode(this) ? Color.WHITE : Color.BLACK);
         tv.setPadding(0, 0, 0, dp(8));
         container.addView(tv);
     }
