@@ -163,6 +163,11 @@ public class ItemDbRepository {
         addNamedEntry("item_topics", "topic", itemId, tag);
     }
 
+    public void deleteTagByValue(long itemId, String tag) {
+        db().delete("item_topics", "item_id = ? AND topic = ?", new String[]{String.valueOf(itemId), tag});
+        touchItem(itemId);
+    }
+
     public void deleteRow(long rowId) {
         long itemId = parentItemId("item_rows", rowId);
         db().delete("item_rows", "id = ?", new String[]{String.valueOf(rowId)});

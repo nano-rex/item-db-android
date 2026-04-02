@@ -15,6 +15,7 @@ public class ImportExportActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ThemePreferences.apply(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_import_export);
         repository = new ItemDbRepository(this);
@@ -27,6 +28,12 @@ public class ImportExportActivity extends AppCompatActivity {
         findViewById(R.id.btnImportMerge).setOnClickListener(v -> importJson(false));
         findViewById(R.id.btnImportReplace).setOnClickListener(v -> importJson(true));
         findViewById(R.id.btnImportDeny).setOnClickListener(v -> denyImport());
+        String mode = getIntent().getStringExtra("mode");
+        if ("export".equals(mode)) {
+            exportJson();
+        } else if ("import".equals(mode)) {
+            tvStatus.setText("Paste JSON to import");
+        }
     }
 
     private void exportJson() {

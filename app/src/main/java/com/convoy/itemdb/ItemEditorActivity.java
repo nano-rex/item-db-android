@@ -38,6 +38,7 @@ public class ItemEditorActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ThemePreferences.apply(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_editor);
 
@@ -226,9 +227,16 @@ public class ItemEditorActivity extends AppCompatActivity {
                             "Progress: " + dash(row.progressText),
                     v -> showRowDialog(row),
                     v -> {
-                        repository.deleteRow(row.id);
-                        tvStatus.setText("Row removed");
-                        refresh();
+                        new AlertDialog.Builder(this)
+                                .setTitle("Remove row")
+                                .setMessage("Remove this structured row?")
+                                .setPositiveButton("Remove", (dialog, which) -> {
+                                    repository.deleteRow(row.id);
+                                    tvStatus.setText("Row removed");
+                                    refresh();
+                                })
+                                .setNegativeButton("Cancel", null)
+                                .show();
                     }));
         }
     }
@@ -241,9 +249,16 @@ public class ItemEditorActivity extends AppCompatActivity {
         }
         for (NamedEntry entry : entries) {
             container.addView(buildRowView(entry.value, null, v -> {
-                repository.deleteTag(entry.id);
-                tvStatus.setText("Tag removed");
-                refresh();
+                new AlertDialog.Builder(this)
+                        .setTitle("Remove tag")
+                        .setMessage("Remove this tag?")
+                        .setPositiveButton("Remove", (dialog, which) -> {
+                            repository.deleteTag(entry.id);
+                            tvStatus.setText("Tag removed");
+                            refresh();
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
             }));
         }
     }

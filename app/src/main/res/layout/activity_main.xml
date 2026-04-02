@@ -5,17 +5,9 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Items"
-            android:textSize="28sp"
-            android:textStyle="bold" />
-
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
         android:scrollbars="none">
 
         <LinearLayout
@@ -30,18 +22,12 @@
                 android:text="New Item" />
 
             <Button
-                android:id="@+id/btnSearch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="Advanced Search" />
-
-            <Button
                 android:id="@+id/btnAnalysis"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Analysis" />
+                android:text="Analysis"
+                android:visibility="gone" />
 
             <Button
                 android:id="@+id/btnSettings"
@@ -73,12 +59,43 @@
             android:text="Filter" />
     </LinearLayout>
 
-    <TextView
+    <LinearLayout
+        android:id="@+id/selectionActions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:text="Saved items"
-        android:textStyle="bold" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tvSelectionCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 selected"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnBulkAddTag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Add Tag" />
+
+        <Button
+            android:id="@+id/btnBulkRemoveTag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Remove Tag" />
+
+        <Button
+            android:id="@+id/btnBulkDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Delete" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tvEmpty"

@@ -6,24 +6,32 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class ItemListAdapter extends BaseAdapter {
     public interface OpenListener { void open(ItemRecord item); }
     public interface DeleteListener { void delete(ItemRecord item); }
+    public interface CheckedListener { void changed(ItemRecord item, boolean checked); }
 
     private final LayoutInflater inflater;
     private final OpenListener openListener;
     private final DeleteListener deleteListener;
+    private final CheckedListener checkedListener;
+    private final Set<Long> checkedIds;
     private final List<ItemRecord> items = new ArrayList<>();
 
-    public ItemListAdapter(Context context, OpenListener openListener, DeleteListener deleteListener) {
+    public ItemListAdapter(Context context, OpenListener openListener, DeleteListener deleteListener, CheckedListener checkedListener, Set<Long> checkedIds) {
         this.inflater = LayoutInflater.from(context);
         this.openListener = openListener;
         this.deleteListener = deleteListener;
+        this.checkedListener = checkedListener;
+        this.checkedIds = checkedIds;
     }
 
     public void setItems(List<ItemRecord> newItems) {
@@ -56,6 +64,10 @@ public class ItemListAdapter extends BaseAdapter {
         view.findViewById(R.id.itemBody).setBackgroundColor(surfaceColor);
         View colorView = view.findViewById(R.id.viewColor);
         colorView.setBackgroundColor(accentColor);
+        CheckBox checkBox = view.findViewById(R.id.cbSelect);
+        checkBox.setOnCheckedChangeListener(null);
+        checkBox.setChecked(checkedIds.contains(item.id));
+        checkBox.setOnCheckedChangeListener((CompoundButton buttonView, boolean isChecked) -> checkedListener.changed(item, isChecked));
         Button open = view.findViewById(R.id.btnOpen);
         Button delete = view.findViewById(R.id.btnDelete);
         open.setOnClickListener(v -> openListener.open(item));
