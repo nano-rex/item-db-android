@@ -2,6 +2,7 @@ package com.convoy.itemdb;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -12,6 +13,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private ItemDbRepository repository;
     private ItemListAdapter adapter;
+    private EditText etQuickSearch;
     private TextView tvEmpty;
 
     @Override
@@ -20,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         repository = new ItemDbRepository(this);
+        etQuickSearch = findViewById(R.id.etQuickSearch);
         tvEmpty = findViewById(R.id.tvEmpty);
         ListView listView = findViewById(R.id.lvItems);
         adapter = new ItemListAdapter(this, item -> openEditor(item.id), item -> {
@@ -29,9 +32,10 @@ public class MainActivity extends AppCompatActivity {
         listView.setAdapter(adapter);
 
         findViewById(R.id.btnNewItem).setOnClickListener(v -> openEditor(0));
-        findViewById(R.id.btnSearch).setOnClickListener(v -> startActivity(new Intent(this, SearchActivity.class)));
-        findViewById(R.id.btnAnalysis).setOnClickListener(v -> startActivity(new Intent(this, AnalysisActivity.class)));
-        findViewById(R.id.btnImportExport).setOnClickListener(v -> startActivity(new Intent(this, ImportExportActivity.class)));
+        findViewById(R.id.btnSearch).setOnClickListener(v -> openSearch());
+        findViewById(R.id.btnAnalysis).setOnClickListener(v -> openSearch());
+        findViewById(R.id.btnSettings).setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
+        findViewById(R.id.btnFilter).setOnClickListener(v -> openSearch());
     }
 
     @Override
@@ -41,14 +45,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void refresh() {
-        List<ItemRecord> items = repository.listItems("");
+        List<ItemRecord> items = repository.listItems(etQuickSearch.getText().toString());
         adapter.setItems(items);
-        tvEmpty.setText(items.isEmpty() ? "No notes yet. Create one from the top bar." : "");
+        tvEmpty.setText(items.isEmpty() ? "No items yet. Create one from the top bar." : "");
     }
 
     private void openEditor(long itemId) {
         Intent intent = new Intent(this, ItemEditorActivity.class);
         intent.putExtra("item_id", itemId);
+        startActivity(intent);
+    }
+
+    private void openSearch() {
+        Intent intent = new Intent(this, SearchActivity.class);
+        intent.putExtra("query", etQuickSearch.getText().toString());
         startActivity(intent);
     }
 }

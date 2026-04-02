@@ -58,6 +58,40 @@
             android:layout_marginTop="12dp"
             android:text="Run Analysis" />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="#CCCCCC" />
+
+        <TextView
+            android:id="@+id/tvBarTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Latest Price Comparison"
+            android:textStyle="bold" />
+
+        <com.convoy.itemdb.SimpleBarChartView
+            android:id="@+id/barChart"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:layout_marginTop="8dp" />
+
+        <TextView
+            android:id="@+id/tvLineTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Price Over Time"
+            android:textStyle="bold" />
+
+        <com.convoy.itemdb.SimpleLineChartView
+            android:id="@+id/lineChart"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:layout_marginTop="8dp" />
+
         <TextView
             android:id="@+id/tvOutput"
             android:layout_width="match_parent"

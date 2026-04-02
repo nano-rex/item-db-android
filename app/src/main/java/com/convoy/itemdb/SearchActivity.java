@@ -21,7 +21,12 @@ public class SearchActivity extends AppCompatActivity {
     private AutoCompleteTextView etLocation;
     private Spinner spTagMode;
     private Spinner spColor;
+    private TextView tvBarTitle;
+    private TextView tvLineTitle;
     private TextView tvEmpty;
+    private TextView tvOutput;
+    private SimpleBarChartView barChart;
+    private SimpleLineChartView lineChart;
     private static final String[] COLOR_LABELS = new String[]{
             "Any color", "Slate", "Blue", "Green", "Amber", "Rose", "Lavender", "Gray"
     };
@@ -39,7 +44,14 @@ public class SearchActivity extends AppCompatActivity {
         etLocation = findViewById(R.id.etLocation);
         spTagMode = findViewById(R.id.spTagMode);
         spColor = findViewById(R.id.spColor);
+        tvBarTitle = findViewById(R.id.tvBarTitle);
+        tvLineTitle = findViewById(R.id.tvLineTitle);
         tvEmpty = findViewById(R.id.tvEmpty);
+        tvOutput = findViewById(R.id.tvOutput);
+        barChart = findViewById(R.id.barChart);
+        lineChart = findViewById(R.id.lineChart);
+        String initialQuery = getIntent().getStringExtra("query");
+        if (initialQuery != null) etSearch.setText(initialQuery);
         etTags.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, repository.listDistinctTags()));
         etLocation.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, repository.listDistinctLocations()));
         spTagMode.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, new String[]{"Match any tag", "Match all tags"}));
@@ -59,14 +71,23 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void refresh() {
+        boolean matchAll = spTagMode.getSelectedItemPosition() == 1;
         List<ItemRecord> items = repository.listItemsFiltered(
                 etSearch.getText().toString(),
                 etTags.getText().toString(),
                 etLocation.getText().toString(),
                 COLOR_VALUES[spColor.getSelectedItemPosition()],
-                spTagMode.getSelectedItemPosition() == 1
+                matchAll
         );
         adapter.setItems(items);
         tvEmpty.setText(items.isEmpty() ? "No matching notes." : "");
+        tvOutput.setText(repository.buildAnalysisReport(etTags.getText().toString(), etLocation.getText().toString(), matchAll));
+        barChart.setBars(repository.buildLatestPriceBars(etTags.getText().toString(), etLocation.getText().toString(), matchAll));
+        ChartLineSeries series = repository.buildPriceTimeline(etTags.getText().toString(), etLocation.getText().toString(), matchAll);
+        tvBarTitle.setText("Latest Price Comparison");
+        tvLineTitle.setText(series.title == null || series.title.trim().isEmpty()
+                ? "Price Over Time"
+                : "Price Over Time: " + series.title);
+        lineChart.setPoints(series.points);
     }
 }

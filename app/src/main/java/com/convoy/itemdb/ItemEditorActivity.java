@@ -1,9 +1,11 @@
 package com.convoy.itemdb;
 
 import android.app.AlertDialog;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -27,6 +29,8 @@ public class ItemEditorActivity extends AppCompatActivity {
     private EditText etTitle;
     private EditText etBody;
     private Spinner spColor;
+    private View editorRoot;
+    private View editorSurface;
     private TextView tvStatus;
     private TextView tvMeta;
     private LinearLayout rowsContainer;
@@ -39,6 +43,8 @@ public class ItemEditorActivity extends AppCompatActivity {
 
         repository = new ItemDbRepository(this);
         itemId = getIntent().getLongExtra("item_id", 0);
+        editorRoot = findViewById(R.id.editorRoot);
+        editorSurface = findViewById(R.id.editorSurface);
         etTitle = findViewById(R.id.etTitle);
         etBody = findViewById(R.id.etBody);
         spColor = findViewById(R.id.spColor);
@@ -47,6 +53,16 @@ public class ItemEditorActivity extends AppCompatActivity {
         rowsContainer = findViewById(R.id.rowsContainer);
         topicsContainer = findViewById(R.id.topicsContainer);
         spColor.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, COLOR_LABELS));
+        spColor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                applyEditorTheme(selectedColor());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
 
         findViewById(R.id.btnSave).setOnClickListener(v -> saveItem());
         findViewById(R.id.btnAddRow).setOnClickListener(v -> showAddRowDialog());
@@ -59,6 +75,7 @@ public class ItemEditorActivity extends AppCompatActivity {
     private void refresh() {
         if (itemId == 0) {
             tvMeta.setText("New note");
+            applyEditorTheme(selectedColor());
             renderEmptySections();
             return;
         }
@@ -66,6 +83,7 @@ public class ItemEditorActivity extends AppCompatActivity {
         etTitle.setText(detail.item.title);
         etBody.setText(detail.item.body == null ? "" : detail.item.body);
         spColor.setSelection(colorIndex(detail.item.colorHex));
+        applyEditorTheme(detail.item.colorHex);
         tvMeta.setText("Rows: " + detail.item.rowCount + "   Tags: " + detail.item.topicCount);
         renderRows(detail);
         renderNamedEntries(topicsContainer, detail.topics);
@@ -293,5 +311,16 @@ public class ItemEditorActivity extends AppCompatActivity {
             if (COLOR_VALUES[i].equalsIgnoreCase(colorHex)) return i;
         }
         return 0;
+    }
+
+    private void applyEditorTheme(String colorHex) {
+        int baseColor = ColorThemeUtil.parseOrDefault(colorHex, "#E2E8F0");
+        int rootColor = ColorThemeUtil.blendTowardWhite(baseColor, 0.75f);
+        int surfaceColor = ColorThemeUtil.blendTowardWhite(baseColor, 0.4f);
+        editorRoot.setBackgroundColor(rootColor);
+        editorSurface.setBackgroundColor(surfaceColor);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ColorThemeUtil.darken(baseColor, 0.18f)));
+        }
     }
 }

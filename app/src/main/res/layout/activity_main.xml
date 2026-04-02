@@ -5,12 +5,12 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Item Notes"
-        android:textSize="28sp"
-        android:textStyle="bold" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Items"
+            android:textSize="28sp"
+            android:textStyle="bold" />
 
     <HorizontalScrollView
         android:layout_width="match_parent"
@@ -27,14 +27,14 @@
                 android:id="@+id/btnNewItem"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="New Note" />
+                android:text="New Item" />
 
             <Button
                 android:id="@+id/btnSearch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Search" />
+                android:text="Advanced Search" />
 
             <Button
                 android:id="@+id/btnAnalysis"
@@ -44,19 +44,40 @@
                 android:text="Analysis" />
 
             <Button
-                android:id="@+id/btnImportExport"
+                android:id="@+id/btnSettings"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Import / Export" />
+                android:text="Settings" />
         </LinearLayout>
     </HorizontalScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/etQuickSearch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Search items" />
+
+        <Button
+            android:id="@+id/btnFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Filter" />
+    </LinearLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:text="Saved notes"
+        android:text="Saved items"
         android:textStyle="bold" />
 
     <TextView

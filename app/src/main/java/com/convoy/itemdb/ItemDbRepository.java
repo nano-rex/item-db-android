@@ -13,6 +13,8 @@ import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -249,6 +251,48 @@ public class ItemDbRepository {
         return out.toString();
     }
 
+    public List<ChartBarEntry> buildLatestPriceBars(String tagsText, String locationText, boolean matchAllTags) {
+        List<String> tags = parseFilters(tagsText);
+        String location = locationText == null ? "" : locationText.trim();
+        List<ItemRecord> items = listItems("");
+        ArrayList<ChartBarEntry> bars = new ArrayList<>();
+        for (ItemRecord item : items) {
+            ItemDetail detail = getItemDetail(item.id);
+            if (!matchesTags(detail, tags, matchAllTags)) continue;
+            ItemRowEntry latest = latestPricedRow(detail, location);
+            if (latest == null) continue;
+            bars.add(new ChartBarEntry(item.title, latest.price));
+        }
+        Collections.sort(bars, Comparator.comparingDouble((ChartBarEntry e) -> e.value).reversed());
+        if (bars.size() > 8) return new ArrayList<>(bars.subList(0, 8));
+        return bars;
+    }
+
+    public ChartLineSeries buildPriceTimeline(String tagsText, String locationText, boolean matchAllTags) {
+        List<String> tags = parseFilters(tagsText);
+        String location = locationText == null ? "" : locationText.trim();
+        List<ItemRecord> items = listItems("");
+        ChartLineSeries best = new ChartLineSeries();
+        int bestCount = 0;
+        for (ItemRecord item : items) {
+            ItemDetail detail = getItemDetail(item.id);
+            if (!matchesTags(detail, tags, matchAllTags)) continue;
+            ArrayList<ChartLinePoint> points = new ArrayList<>();
+            for (ItemRowEntry row : detail.rows) {
+                if (!row.hasPrice) continue;
+                if (!location.isEmpty() && !location.equalsIgnoreCase(safe(row.location))) continue;
+                points.add(new ChartLinePoint(safe(row.entryDate), row.price));
+            }
+            if (points.size() > bestCount) {
+                bestCount = points.size();
+                best.title = item.title;
+                best.points.clear();
+                best.points.addAll(points);
+            }
+        }
+        return best;
+    }
+
     public String exportJsonToFile() throws Exception {
         JSONObject root = new JSONObject();
         root.put("items", queryArray("SELECT id, title, body, color_hex, created_at, updated_at FROM items ORDER BY id"));
@@ -420,6 +464,16 @@ public class ItemDbRepository {
             if (itemTags.contains(filter.toLowerCase(Locale.US))) return true;
         }
         return false;
+    }
+
+    private ItemRowEntry latestPricedRow(ItemDetail detail, String location) {
+        for (int i = detail.rows.size() - 1; i >= 0; i--) {
+            ItemRowEntry row = detail.rows.get(i);
+            if (!row.hasPrice) continue;
+            if (!location.isEmpty() && !location.equalsIgnoreCase(safe(row.location))) continue;
+            return row;
+        }
+        return null;
     }
 
     private boolean matchesLocation(ItemDetail detail, String location) {

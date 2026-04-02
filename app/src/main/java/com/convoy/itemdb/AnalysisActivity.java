@@ -13,7 +13,11 @@ public class AnalysisActivity extends AppCompatActivity {
     private AutoCompleteTextView etTags;
     private AutoCompleteTextView etLocation;
     private Spinner spMode;
+    private TextView tvBarTitle;
+    private TextView tvLineTitle;
     private TextView tvOutput;
+    private SimpleBarChartView barChart;
+    private SimpleLineChartView lineChart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +27,11 @@ public class AnalysisActivity extends AppCompatActivity {
         etTags = findViewById(R.id.etTopics);
         etLocation = findViewById(R.id.etLocation);
         spMode = findViewById(R.id.spMode);
+        tvBarTitle = findViewById(R.id.tvBarTitle);
+        tvLineTitle = findViewById(R.id.tvLineTitle);
         tvOutput = findViewById(R.id.tvOutput);
+        barChart = findViewById(R.id.barChart);
+        lineChart = findViewById(R.id.lineChart);
 
         spMode.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
                 new String[]{"Match any tag", "Match all tags"}));
@@ -37,5 +45,12 @@ public class AnalysisActivity extends AppCompatActivity {
     private void runAnalysis() {
         boolean matchAll = spMode.getSelectedItemPosition() == 1;
         tvOutput.setText(repository.buildAnalysisReport(etTags.getText().toString(), etLocation.getText().toString(), matchAll));
+        barChart.setBars(repository.buildLatestPriceBars(etTags.getText().toString(), etLocation.getText().toString(), matchAll));
+        ChartLineSeries series = repository.buildPriceTimeline(etTags.getText().toString(), etLocation.getText().toString(), matchAll);
+        tvBarTitle.setText("Latest Price Comparison");
+        tvLineTitle.setText(series.title == null || series.title.trim().isEmpty()
+                ? "Price Over Time"
+                : "Price Over Time: " + series.title);
+        lineChart.setPoints(series.points);
     }
 }
