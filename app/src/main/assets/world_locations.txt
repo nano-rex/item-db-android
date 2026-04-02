@@ -1,0 +1,418 @@
+New York
+Los Angeles
+Chicago
+Houston
+Phoenix
+Philadelphia
+San Antonio
+San Diego
+Dallas
+San Jose
+Austin
+Jacksonville
+Fort Worth
+Columbus
+Charlotte
+San Francisco
+Indianapolis
+Seattle
+Denver
+Washington
+Boston
+Nashville
+Detroit
+Portland
+Las Vegas
+Atlanta
+Miami
+Orlando
+Tampa
+Toronto
+Montreal
+Vancouver
+Calgary
+Ottawa
+Edmonton
+Quebec City
+Winnipeg
+Halifax
+Mexico City
+Guadalajara
+Monterrey
+Tijuana
+Puebla
+Merida
+Bogota
+Medellin
+Cali
+Cartagena
+Lima
+Arequipa
+Cusco
+Santiago
+Valparaiso
+Concepcion
+Buenos Aires
+Cordoba
+Rosario
+Mendoza
+Sao Paulo
+Rio de Janeiro
+Brasilia
+Salvador
+Fortaleza
+Recife
+Porto Alegre
+Curitiba
+Belo Horizonte
+Montevideo
+Asuncion
+La Paz
+Santa Cruz
+Quito
+Guayaquil
+Caracas
+Panama City
+San Jose, Costa Rica
+Havana
+Santo Domingo
+Kingston
+London
+Manchester
+Birmingham
+Liverpool
+Leeds
+Glasgow
+Edinburgh
+Bristol
+Cardiff
+Belfast
+Dublin
+Cork
+Galway
+Paris
+Marseille
+Lyon
+Toulouse
+Nice
+Nantes
+Strasbourg
+Lille
+Berlin
+Hamburg
+Munich
+Cologne
+Frankfurt
+Stuttgart
+Dusseldorf
+Leipzig
+Dresden
+Amsterdam
+Rotterdam
+The Hague
+Utrecht
+Eindhoven
+Brussels
+Antwerp
+Ghent
+Luxembourg
+Zurich
+Geneva
+Basel
+Bern
+Lausanne
+Vienna
+Salzburg
+Graz
+Innsbruck
+Madrid
+Barcelona
+Valencia
+Seville
+Malaga
+Bilbao
+Lisbon
+Porto
+Coimbra
+Rome
+Milan
+Naples
+Turin
+Bologna
+Florence
+Venice
+Palermo
+Athens
+Thessaloniki
+Warsaw
+Krakow
+Gdansk
+Wroclaw
+Prague
+Brno
+Budapest
+Bucharest
+Cluj-Napoca
+Sofia
+Belgrade
+Zagreb
+Ljubljana
+Sarajevo
+Skopje
+Tirana
+Podgorica
+Kyiv
+Lviv
+Odessa
+Minsk
+Moscow
+Saint Petersburg
+Kazan
+Novosibirsk
+Istanbul
+Ankara
+Izmir
+Bursa
+Antalya
+Dubai
+Abu Dhabi
+Sharjah
+Doha
+Riyadh
+Jeddah
+Mecca
+Medina
+Dammam
+Khobar
+Kuwait City
+Muscat
+Manama
+Amman
+Jerusalem
+Tel Aviv
+Haifa
+Beirut
+Cairo
+Alexandria
+Giza
+Casablanca
+Rabat
+Marrakesh
+Tangier
+Algiers
+Tunis
+Tripoli
+Cape Town
+Johannesburg
+Pretoria
+Durban
+Port Elizabeth
+Nairobi
+Mombasa
+Addis Ababa
+Accra
+Lagos
+Abuja
+Kano
+Dakar
+Kampala
+Dar es Salaam
+Kigali
+Harare
+Lusaka
+Gaborone
+Windhoek
+Maputo
+Mauritius
+Victoria
+Bangkok
+Chiang Mai
+Phuket
+Pattaya
+Hanoi
+Ho Chi Minh City
+Da Nang
+Hai Phong
+Phnom Penh
+Siem Reap
+Vientiane
+Yangon
+Mandalay
+Kuala Lumpur
+Putrajaya
+Labuan
+Johor Bahru
+George Town
+Ipoh
+Shah Alam
+Petaling Jaya
+Subang Jaya
+Klang
+Kajang
+Cyberjaya
+Kota Bharu
+Kuala Terengganu
+Kuantan
+Alor Setar
+Melaka City
+Seremban
+Kuching
+Miri
+Sibu
+Bintulu
+Kota Kinabalu
+Sandakan
+Tawau
+Singapore
+Jakarta
+Surabaya
+Bandung
+Medan
+Semarang
+Yogyakarta
+Denpasar
+Makassar
+Manila
+Quezon City
+Cebu City
+Davao City
+Iloilo City
+Baguio
+Tokyo
+Yokohama
+Osaka
+Kyoto
+Nagoya
+Sapporo
+Fukuoka
+Kobe
+Hiroshima
+Sendai
+Seoul
+Busan
+Incheon
+Daegu
+Daejeon
+Gwangju
+Taipei
+New Taipei
+Taichung
+Tainan
+Kaohsiung
+Hong Kong
+Macau
+Beijing
+Shanghai
+Shenzhen
+Guangzhou
+Chengdu
+Chongqing
+Wuhan
+Hangzhou
+Nanjing
+Suzhou
+Tianjin
+Xian
+Harbin
+Qingdao
+Ningbo
+Fuzhou
+Xiamen
+Shenyang
+Kunming
+Changsha
+Zhengzhou
+Urumqi
+Lhasa
+Hohhot
+Sydney
+Melbourne
+Brisbane
+Perth
+Adelaide
+Canberra
+Hobart
+Darwin
+Auckland
+Wellington
+Christchurch
+Hamilton
+Dunedin
+New South Wales
+Victoria
+Queensland
+South Australia
+Western Australia
+Tasmania
+Northern Territory
+Australian Capital Territory
+California
+Texas
+Florida
+New York State
+Washington State
+Oregon
+Nevada
+Arizona
+Colorado
+Illinois
+Ontario
+Quebec
+British Columbia
+Alberta
+Manitoba
+Saskatchewan
+Nova Scotia
+Prince Edward Island
+New Brunswick
+Newfoundland and Labrador
+Scotland
+Wales
+England
+Northern Ireland
+Bavaria
+Hesse
+Saxony
+North Rhine-Westphalia
+Catalonia
+Andalusia
+Valencian Community
+Lombardy
+Sicily
+Piedmont
+Ile-de-France
+Occitanie
+Normandy
+Tokyo Prefecture
+Osaka Prefecture
+Kyoto Prefecture
+Hokkaido
+Okinawa
+Gyeonggi
+Jeju
+Punjab
+Sindh
+Balochistan
+Khyber Pakhtunkhwa
+Maharashtra
+Delhi
+Karnataka
+Tamil Nadu
+Kerala
+Telangana
+Gujarat
+Rajasthan
+West Bengal
+Uttar Pradesh
+Madhya Pradesh
+Bihar
+Punjab, India
+Dhaka
+Chittagong
+Khulna
+Rajshahi
+Kathmandu
+Pokhara
+Colombo
+Kandy
+Male

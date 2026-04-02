@@ -20,15 +20,7 @@ public class SettingsActivity extends AppCompatActivity {
             recreate();
         });
 
-        findViewById(R.id.btnImport).setOnClickListener(v -> {
-            Intent intent = new Intent(this, ImportExportActivity.class);
-            intent.putExtra("mode", "import");
-            startActivity(intent);
-        });
-        findViewById(R.id.btnExport).setOnClickListener(v -> {
-            Intent intent = new Intent(this, ImportExportActivity.class);
-            intent.putExtra("mode", "export");
-            startActivity(intent);
-        });
+        findViewById(R.id.btnImport).setOnClickListener(v -> startActivity(new Intent(this, ImportActivity.class)));
+        findViewById(R.id.btnExport).setOnClickListener(v -> startActivity(new Intent(this, ExportActivity.class)));
     }
 }

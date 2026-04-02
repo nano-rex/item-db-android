@@ -1,18 +1,12 @@
 package com.convoy.itemdb;
 
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class AnalysisActivity extends AppCompatActivity {
     private ItemDbRepository repository;
-    private AutoCompleteTextView etTags;
-    private AutoCompleteTextView etLocation;
-    private Spinner spMode;
     private TextView tvBarTitle;
     private TextView tvLineTitle;
     private TextView tvOutput;
@@ -21,32 +15,27 @@ public class AnalysisActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ThemePreferences.apply(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_analysis);
         repository = new ItemDbRepository(this);
-        etTags = findViewById(R.id.etTopics);
-        etLocation = findViewById(R.id.etLocation);
-        spMode = findViewById(R.id.spMode);
         tvBarTitle = findViewById(R.id.tvBarTitle);
         tvLineTitle = findViewById(R.id.tvLineTitle);
         tvOutput = findViewById(R.id.tvOutput);
         barChart = findViewById(R.id.barChart);
         lineChart = findViewById(R.id.lineChart);
-
-        spMode.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
-                new String[]{"Match any tag", "Match all tags"}));
-        etTags.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, repository.listDistinctTags()));
-        etLocation.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, repository.listDistinctLocations()));
-
-        findViewById(R.id.btnRunAnalysis).setOnClickListener(v -> runAnalysis());
         runAnalysis();
     }
 
     private void runAnalysis() {
-        boolean matchAll = spMode.getSelectedItemPosition() == 1;
-        tvOutput.setText(repository.buildAnalysisReport(etTags.getText().toString(), etLocation.getText().toString(), matchAll));
-        barChart.setBars(repository.buildLatestPriceBars(etTags.getText().toString(), etLocation.getText().toString(), matchAll));
-        ChartLineSeries series = repository.buildPriceTimeline(etTags.getText().toString(), etLocation.getText().toString(), matchAll);
+        String query = getIntent().getStringExtra("query");
+        String tags = getIntent().getStringExtra("tags");
+        String location = getIntent().getStringExtra("location");
+        String color = getIntent().getStringExtra("color");
+        boolean matchAll = getIntent().getBooleanExtra("match_all_tags", false);
+        tvOutput.setText(repository.buildAnalysisReport(query == null ? "" : query, tags == null ? "" : tags, location == null ? "" : location, color == null ? "" : color, matchAll));
+        barChart.setBars(repository.buildLatestPriceBars(query == null ? "" : query, tags == null ? "" : tags, location == null ? "" : location, color == null ? "" : color, matchAll));
+        ChartLineSeries series = repository.buildPriceTimeline(query == null ? "" : query, tags == null ? "" : tags, location == null ? "" : location, color == null ? "" : color, matchAll);
         tvBarTitle.setText("Latest Price Comparison");
         tvLineTitle.setText(series.title == null || series.title.trim().isEmpty()
                 ? "Price Over Time"

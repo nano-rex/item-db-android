@@ -20,43 +20,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Tags" />
-
-        <AutoCompleteTextView
-            android:id="@+id/etTopics"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="technology, programming" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Tag match mode" />
-
-        <Spinner
-            android:id="@+id/spMode"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Location" />
-
-        <AutoCompleteTextView
-            android:id="@+id/etLocation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Optional location filter" />
-
-        <Button
-            android:id="@+id/btnRunAnalysis"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Run Analysis" />
+            android:text="Charts below are based on the currently applied home-page filters."
+            android:textSize="14sp" />
 
         <View
             android:layout_width="match_parent"

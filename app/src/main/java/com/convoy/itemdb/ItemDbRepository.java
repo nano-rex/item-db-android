@@ -64,11 +64,9 @@ public class ItemDbRepository {
                         "(SELECT COUNT(*) FROM item_rows r WHERE r.item_id = i.id), " +
                         "(SELECT COUNT(*) FROM item_topics t WHERE t.item_id = i.id) " +
                         "FROM items i " +
-                        "WHERE (? = '' OR i.title LIKE ? OR COALESCE(i.body, '') LIKE ? " +
-                        "OR EXISTS (SELECT 1 FROM item_topics t2 WHERE t2.item_id = i.id AND t2.topic LIKE ?) " +
-                        "OR EXISTS (SELECT 1 FROM item_rows r2 WHERE r2.item_id = i.id AND COALESCE(r2.progress_text, '') LIKE ?)) " +
+                        "WHERE (? = '' OR i.title LIKE ?) " +
                         "ORDER BY i.updated_at DESC, i.id DESC",
-                new String[]{term, like, like, like, like}
+                new String[]{term, like}
         );
         while (c.moveToNext()) {
             ItemRecord item = new ItemRecord();
@@ -195,9 +193,13 @@ public class ItemDbRepository {
     }
 
     public String buildAnalysisReport(String tagsText, String locationText, boolean matchAllTags) {
+        return buildAnalysisReport("", tagsText, locationText, "", matchAllTags);
+    }
+
+    public String buildAnalysisReport(String query, String tagsText, String locationText, String colorHex, boolean matchAllTags) {
         List<String> tags = parseFilters(tagsText);
         String location = locationText == null ? "" : locationText.trim();
-        List<ItemRecord> items = listItems("");
+        List<ItemRecord> items = listItemsFiltered(query, tagsText, locationText, colorHex, matchAllTags);
         StringBuilder out = new StringBuilder();
         out.append("Analysis\n");
         out.append("Tags: ").append(tags.isEmpty() ? "Any" : String.join(", ", tags)).append("\n");
@@ -257,9 +259,13 @@ public class ItemDbRepository {
     }
 
     public List<ChartBarEntry> buildLatestPriceBars(String tagsText, String locationText, boolean matchAllTags) {
+        return buildLatestPriceBars("", tagsText, locationText, "", matchAllTags);
+    }
+
+    public List<ChartBarEntry> buildLatestPriceBars(String query, String tagsText, String locationText, String colorHex, boolean matchAllTags) {
         List<String> tags = parseFilters(tagsText);
         String location = locationText == null ? "" : locationText.trim();
-        List<ItemRecord> items = listItems("");
+        List<ItemRecord> items = listItemsFiltered(query, tagsText, locationText, colorHex, matchAllTags);
         ArrayList<ChartBarEntry> bars = new ArrayList<>();
         for (ItemRecord item : items) {
             ItemDetail detail = getItemDetail(item.id);
@@ -274,9 +280,13 @@ public class ItemDbRepository {
     }
 
     public ChartLineSeries buildPriceTimeline(String tagsText, String locationText, boolean matchAllTags) {
+        return buildPriceTimeline("", tagsText, locationText, "", matchAllTags);
+    }
+
+    public ChartLineSeries buildPriceTimeline(String query, String tagsText, String locationText, String colorHex, boolean matchAllTags) {
         List<String> tags = parseFilters(tagsText);
         String location = locationText == null ? "" : locationText.trim();
-        List<ItemRecord> items = listItems("");
+        List<ItemRecord> items = listItemsFiltered(query, tagsText, locationText, colorHex, matchAllTags);
         ChartLineSeries best = new ChartLineSeries();
         int bestCount = 0;
         for (ItemRecord item : items) {
@@ -502,6 +512,7 @@ public class ItemDbRepository {
     private Double parseDouble(String raw) {
         String value = raw == null ? "" : raw.trim();
         if (value.isEmpty()) return null;
+        value = value.replace(",", "").replace("RM", "").replace("rm", "").trim();
         return Double.parseDouble(value);
     }
 

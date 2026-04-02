@@ -1,9 +1,12 @@
 package com.convoy.itemdb;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.InputType;
+import android.text.TextWatcher;
+import android.text.Editable;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -16,6 +19,16 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.text.DecimalFormat;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+
 public class ItemEditorActivity extends AppCompatActivity {
     private static final String[] COLOR_LABELS = new String[]{
             "Slate", "Blue", "Green", "Amber", "Rose", "Lavender", "Gray"
@@ -23,6 +36,7 @@ public class ItemEditorActivity extends AppCompatActivity {
     private static final String[] COLOR_VALUES = new String[]{
             "#E2E8F0", "#DBEAFE", "#DCFCE7", "#FEF3C7", "#FFE4E6", "#EDE9FE", "#E5E7EB"
     };
+    private static final String WORLD_LOCATIONS_ASSET = "world_locations.txt";
 
     private ItemDbRepository repository;
     private long itemId;
@@ -140,43 +154,61 @@ public class ItemEditorActivity extends AppCompatActivity {
         int padding = dp(12);
         layout.setPadding(padding, padding, padding, padding);
 
-        EditText etPrice = field("Price", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        EditText etLocation = field("Location", InputType.TYPE_CLASS_TEXT);
-        EditText etDate = field("Date", InputType.TYPE_CLASS_DATETIME);
-        EditText etRanking = field("Ranking", InputType.TYPE_CLASS_TEXT);
-        EditText etProgress = field("Progress", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
-        layout.addView(etPrice);
-        layout.addView(etLocation);
-        layout.addView(etDate);
-        layout.addView(etRanking);
-        layout.addView(etProgress);
+        EditText etPrice = field("Enter amount", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        AutoCompleteTextView etLocation = new AutoCompleteTextView(this);
+        etLocation.setHint("Choose or type a city, state, or province");
+        etLocation.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+        etLocation.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, worldLocationSuggestions()));
+        EditText etDate = field("YYYY-MM-DD", InputType.TYPE_CLASS_DATETIME);
+        EditText etRanking = field("0-100", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        EditText etProgress = field("0-100", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+
+        etDate.setFocusable(false);
+        etDate.setClickable(true);
+        etDate.setOnClickListener(v -> showDatePicker(etDate));
+        etDate.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                v.clearFocus();
+                showDatePicker(etDate);
+            }
+        });
+        attachPriceFormatting(etPrice);
+
+        addLabeledField(layout, "Price", etPrice);
+        addLabeledField(layout, "Location", etLocation);
+        addLabeledField(layout, "Date", etDate);
+        addLabeledField(layout, "Ranking (%)", etRanking);
+        addLabeledField(layout, "Progress (%)", etProgress);
         if (existingRow != null) {
-            etPrice.setText(existingRow.hasPrice ? String.valueOf(existingRow.price) : "");
+            etPrice.setText(existingRow.hasPrice ? formatPrice(existingRow.price) : "");
             etLocation.setText(existingRow.location == null ? "" : existingRow.location);
             etDate.setText(existingRow.entryDate == null ? "" : existingRow.entryDate);
-            etRanking.setText(existingRow.ranking == null ? "" : existingRow.ranking);
-            etProgress.setText(existingRow.progressText == null ? "" : existingRow.progressText);
+            etRanking.setText(stripPercent(existingRow.ranking));
+            etProgress.setText(stripPercent(existingRow.progressText));
         }
 
         new AlertDialog.Builder(this)
                 .setTitle(existingRow == null ? "Add structured row" : "Edit structured row")
                 .setView(layout)
                 .setPositiveButton(existingRow == null ? "Add" : "Save", (dialog, which) -> {
+                    String priceValue = normalizePrice(etPrice.getText().toString());
+                    String rankingValue = normalizePercent(etRanking.getText().toString());
+                    String progressValue = normalizePercent(etProgress.getText().toString());
                     if (existingRow == null) {
                         repository.addRow(itemId,
-                                etPrice.getText().toString(),
+                                priceValue,
                                 etLocation.getText().toString(),
                                 etDate.getText().toString(),
-                                etRanking.getText().toString(),
-                                etProgress.getText().toString());
+                                rankingValue,
+                                progressValue);
                         tvStatus.setText("Row added");
                     } else {
                         repository.updateRow(existingRow.id,
-                                etPrice.getText().toString(),
+                                priceValue,
                                 etLocation.getText().toString(),
                                 etDate.getText().toString(),
-                                etRanking.getText().toString(),
-                                etProgress.getText().toString());
+                                rankingValue,
+                                progressValue);
                         tvStatus.setText("Row updated");
                     }
                     refresh();
@@ -220,11 +252,11 @@ public class ItemEditorActivity extends AppCompatActivity {
         }
         for (ItemRowEntry row : detail.rows) {
             rowsContainer.addView(buildRowView(
-                    (row.hasPrice ? "Price: " + row.price : "Price: -") + "\n" +
+                    (row.hasPrice ? "Price: " + formatPrice(row.price) : "Price: -") + "\n" +
                             "Location: " + dash(row.location) + "\n" +
                             "Date: " + dash(row.entryDate) + "\n" +
-                            "Ranking: " + dash(row.ranking) + "\n" +
-                            "Progress: " + dash(row.progressText),
+                            "Ranking: " + formatPercentForDisplay(row.ranking) + "\n" +
+                            "Progress: " + formatPercentForDisplay(row.progressText),
                     v -> showRowDialog(row),
                     v -> {
                         new AlertDialog.Builder(this)
@@ -305,6 +337,92 @@ public class ItemEditorActivity extends AppCompatActivity {
         input.setHint(hint);
         input.setInputType(inputType);
         return input;
+    }
+
+    private void addLabeledField(LinearLayout parent, String label, View field) {
+        TextView tv = new TextView(this);
+        tv.setText(label);
+        tv.setPadding(0, dp(8), 0, dp(4));
+        parent.addView(tv);
+        parent.addView(field);
+    }
+
+    private void showDatePicker(EditText target) {
+        LocalDate date = parseDate(target.getText().toString());
+        DatePickerDialog dialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) ->
+                target.setText(String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, dayOfMonth)),
+                date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth());
+        dialog.show();
+    }
+
+    private LocalDate parseDate(String raw) {
+        try {
+            return raw == null || raw.trim().isEmpty() ? LocalDate.now() : LocalDate.parse(raw.trim());
+        } catch (Exception ignored) {
+            return LocalDate.now();
+        }
+    }
+
+    private List<String> worldLocationSuggestions() {
+        LinkedHashSet<String> values = new LinkedHashSet<>();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(getAssets().open(WORLD_LOCATIONS_ASSET)))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String value = line.trim();
+                if (!value.isEmpty()) values.add(value);
+            }
+        } catch (IOException ignored) {
+        }
+        values.addAll(repository.listDistinctLocations());
+        return new ArrayList<>(values);
+    }
+
+    private void attachPriceFormatting(EditText editText) {
+        editText.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                String normalized = normalizePrice(editText.getText().toString());
+                editText.setText(normalized);
+            }
+        });
+    }
+
+    private String normalizePrice(String raw) {
+        String cleaned = raw == null ? "" : raw.replace(",", "").trim();
+        if (cleaned.isEmpty()) return "";
+        try {
+            double value = Double.parseDouble(cleaned);
+            return formatPrice(value);
+        } catch (Exception ignored) {
+            return raw == null ? "" : raw.trim();
+        }
+    }
+
+    private String formatPrice(double value) {
+        return new DecimalFormat("#,##0.00").format(value);
+    }
+
+    private String normalizePercent(String raw) {
+        String cleaned = stripPercent(raw);
+        if (cleaned.isEmpty()) return "";
+        try {
+            double value = Double.parseDouble(cleaned);
+            if (value == Math.rint(value)) {
+                return String.format(Locale.US, "%.0f%%", value);
+            }
+            return String.format(Locale.US, "%.2f%%", value);
+        } catch (Exception ignored) {
+            return cleaned + "%";
+        }
+    }
+
+    private String stripPercent(String raw) {
+        return raw == null ? "" : raw.replace("%", "").trim();
+    }
+
+    private String formatPercentForDisplay(String raw) {
+        String value = raw == null ? "" : raw.trim();
+        if (value.isEmpty()) return "-";
+        return value.endsWith("%") ? value : value + "%";
     }
 
     private String dash(String value) {
