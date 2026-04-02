@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         selectionActions = findViewById(R.id.selectionActions);
         tvSelectionCount = findViewById(R.id.tvSelectionCount);
         ListView listView = findViewById(R.id.lvItems);
-        adapter = new ItemListAdapter(this, item -> openEditor(item.id), this::confirmDeleteSingleItem, (item, checked) -> {
+        adapter = new ItemListAdapter(this, item -> openEditor(item.id), item -> openItemAnalysis(item.id), this::confirmDeleteSingleItem, (item, checked) -> {
             if (checked) selectedItemIds.add(item.id); else selectedItemIds.remove(item.id);
             updateSelectionUi();
         }, selectedItemIds);
@@ -108,7 +108,12 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("location", filterLocation);
         intent.putExtra("color", filterColorHex);
         intent.putExtra("match_all_tags", matchAllTags);
-        intent.putExtra("auto_analyze", true);
+        startActivity(intent);
+    }
+
+    private void openItemAnalysis(long itemId) {
+        Intent intent = new Intent(this, AnalysisActivity.class);
+        intent.putExtra("item_id", itemId);
         startActivity(intent);
     }
 

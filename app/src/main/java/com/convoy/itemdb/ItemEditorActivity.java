@@ -448,12 +448,20 @@ public class ItemEditorActivity extends AppCompatActivity {
 
     private void applyEditorTheme(String colorHex) {
         int baseColor = ColorThemeUtil.parseOrDefault(colorHex, "#E2E8F0");
-        int rootColor = ColorThemeUtil.blendTowardWhite(baseColor, 0.75f);
-        int surfaceColor = ColorThemeUtil.blendTowardWhite(baseColor, 0.4f);
+        boolean darkMode = ThemePreferences.isDarkMode(this);
+        int rootColor = darkMode
+                ? ColorThemeUtil.blendTowardBlack(baseColor, 0.72f)
+                : ColorThemeUtil.blendTowardWhite(baseColor, 0.75f);
+        int surfaceColor = darkMode
+                ? ColorThemeUtil.blendTowardBlack(baseColor, 0.52f)
+                : ColorThemeUtil.blendTowardWhite(baseColor, 0.4f);
         editorRoot.setBackgroundColor(rootColor);
         editorSurface.setBackgroundColor(surfaceColor);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ColorThemeUtil.darken(baseColor, 0.18f)));
+            int barColor = darkMode
+                    ? ColorThemeUtil.blendTowardBlack(baseColor, 0.78f)
+                    : ColorThemeUtil.darken(baseColor, 0.18f);
+            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(barColor));
         }
     }
 }

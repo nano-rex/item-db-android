@@ -308,6 +308,62 @@ public class ItemDbRepository {
         return best;
     }
 
+    public String buildItemAnalysisReport(long itemId) {
+        ItemDetail detail = getItemDetail(itemId);
+        StringBuilder out = new StringBuilder();
+        out.append("Item Analysis\n");
+        out.append("Label: ").append(safe(detail.item.title)).append("\n");
+        out.append("Tags: ").append(joinValues(detail.topics)).append("\n");
+        out.append("Rows: ").append(detail.rows.size()).append("\n\n");
+        if (detail.rows.isEmpty()) {
+            out.append("No structured rows available.");
+            return out.toString();
+        }
+        ItemRowEntry latest = detail.rows.get(detail.rows.size() - 1);
+        out.append("Latest entry\n");
+        out.append("Price: ").append(latest.hasPrice ? formatPrice(latest.price) : "-").append("\n");
+        out.append("Ranking: ").append(safe(latest.ranking)).append("\n");
+        out.append("Progress: ").append(safe(latest.progressText)).append("\n");
+        out.append("Location: ").append(safe(latest.location)).append("\n");
+        out.append("Date: ").append(safe(latest.entryDate)).append("\n\n");
+        out.append("Timeline\n");
+        for (ItemRowEntry row : detail.rows) {
+            out.append("- ")
+                    .append(safe(row.entryDate))
+                    .append(" | ").append(safe(row.location))
+                    .append(" | price ").append(row.hasPrice ? formatPrice(row.price) : "-")
+                    .append(" | rank ").append(safe(row.ranking))
+                    .append(" | progress ").append(safe(row.progressText))
+                    .append("\n");
+        }
+        return out.toString();
+    }
+
+    public List<ChartBarEntry> buildItemPriceBars(long itemId) {
+        ItemDetail detail = getItemDetail(itemId);
+        ArrayList<ChartBarEntry> bars = new ArrayList<>();
+        int index = 1;
+        for (ItemRowEntry row : detail.rows) {
+            if (!row.hasPrice) continue;
+            String label = safe(row.entryDate);
+            if (label.isEmpty() || "-".equals(label)) label = "Row " + index;
+            bars.add(new ChartBarEntry(label, row.price));
+            index++;
+        }
+        return bars;
+    }
+
+    public ChartLineSeries buildItemPriceTimeline(long itemId) {
+        ItemDetail detail = getItemDetail(itemId);
+        ChartLineSeries series = new ChartLineSeries();
+        series.title = detail.item.title;
+        for (ItemRowEntry row : detail.rows) {
+            if (!row.hasPrice) continue;
+            series.points.add(new ChartLinePoint(safe(row.entryDate), row.price));
+        }
+        return series;
+    }
+
     public String exportJsonToFile() throws Exception {
         JSONObject root = new JSONObject();
         root.put("items", queryArray("SELECT id, title, body, color_hex, created_at, updated_at FROM items ORDER BY id"));
