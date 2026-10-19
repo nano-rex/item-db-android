@@ -39,3 +39,8 @@ export PATH="$JAVA_HOME/bin:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/c
 
 APK output:
 - `app/build/outputs/apk/debug/app-debug.apk`
+
+
+## Security
+
+The app opens behind a login screen using the `user` account with initial password `12345678`. Application data is stored in a SQLCipher-encrypted SQLite database and is only opened after successful authentication. Change the initial credential before distributing the app.

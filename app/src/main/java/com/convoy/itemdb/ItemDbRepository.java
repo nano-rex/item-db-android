@@ -3,7 +3,7 @@ package com.convoy.itemdb;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import net.sqlcipher.database.SQLiteDatabase;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -28,7 +28,7 @@ public class ItemDbRepository {
     }
 
     private SQLiteDatabase db() {
-        return helper.getWritableDatabase();
+        return helper.writable();
     }
 
     public long createItem(String title, String body, String colorHex) {

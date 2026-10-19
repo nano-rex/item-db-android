@@ -1,8 +1,8 @@
 package com.convoy.itemdb;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
+import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.database.SQLiteOpenHelper;
 
 public class ItemDbOpenHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "itemdb.db";
@@ -71,4 +71,7 @@ public class ItemDbOpenHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE INDEX idx_item_rows_item ON item_rows(item_id);");
         db.execSQL("CREATE INDEX idx_item_topics_item ON item_topics(item_id);");
     }
+    public SQLiteDatabase readable() { return getReadableDatabase(AuthSession.password()); }
+    public SQLiteDatabase writable() { return getWritableDatabase(AuthSession.password()); }
+
 }
